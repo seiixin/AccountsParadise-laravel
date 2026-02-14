@@ -96,37 +96,39 @@ export default function Conversation({ conversationId }) {
     const token = csrf();
     const hasFile = !!attachment;
     if (hasFile && attError) return;
+    const currentContent = content;
+    const currentPreview = attPreview;
     const tempId = `temp-${Date.now()}`;
     const optimistic = {
       id: tempId,
       sender_id: meId,
       sender_name: meName || 'Me',
-      content,
+      content: currentContent,
       attachment_path: null,
-      attachment_url: attPreview || null,
+      attachment_url: currentPreview || null,
       address_to_ids: [],
       created_at: new Date().toISOString(),
     };
     setMessages((prev) => [...prev, optimistic]);
+    setContent('');
+    setAttachment(null);
+    setAttPreview(null);
+    setAttError('');
     let res;
     if (hasFile) {
       const fd = new FormData();
-      fd.append('content', content);
+      fd.append('content', currentContent);
       fd.append('attachment', attachment);
       res = await axios.post(`${base}/chat/${conversationId}/messages`, fd, {
         headers: { Accept: 'application/json', 'X-CSRF-TOKEN': token, 'X-XSRF-TOKEN': token, 'X-Requested-With': 'XMLHttpRequest', 'Content-Type': 'multipart/form-data' },
         withCredentials: true,
       });
     } else {
-      res = await axios.post(`${base}/chat/${conversationId}/messages`, { content }, {
+      res = await axios.post(`${base}/chat/${conversationId}/messages`, { content: currentContent }, {
         headers: { Accept: 'application/json', 'X-CSRF-TOKEN': token, 'X-XSRF-TOKEN': token, 'X-Requested-With': 'XMLHttpRequest' },
         withCredentials: true,
       });
     }
-    setContent('');
-    setAttachment(null);
-    setAttPreview(null);
-    setAttError('');
     const msg = res?.data?.message;
     if (msg) {
       if (msg?.id) idsRef.current.add(msg.id);
@@ -351,31 +353,44 @@ export default function Conversation({ conversationId }) {
                 </button>
               </div>
             </div>
-            <div className="hidden lg:flex items-center gap-2 p-2">
-              <button
-                type="button"
-                className="rounded glass-soft p-2 text-neutral-200 hover:text-white"
-                onClick={() => fileInputRef.current?.click()}
-                aria-label="Attach"
-                title="Attach"
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                  <path d="M21 12L10 23a6 6 0 01-8.49-8.49L12 4a4 4 0 116 6L8 22" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </button>
-              <input
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    send();
-                  }
-                }}
-                placeholder="Type message..."
-                className="ap-input flex-1 px-3 py-2"
-              />
-              <button onClick={send} className="ap-btn-primary ap-pill px-4 py-2">Send</button>
+            <div className="hidden lg:block p-2">
+              <div className="relative flex items-center rounded-full border border-blue-400 bg-black text-neutral-100 px-3 py-2 shadow-sm">
+                <input
+                  value={content}
+                  onChange={(e) => setContent(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      send();
+                    }
+                  }}
+                  placeholder="Type a message"
+                  className="flex-1 bg-transparent border-none ring-0 outline-none focus:ring-0 focus:outline-none appearance-none pr-16 text-sm text-white placeholder-white/50"
+                />
+                <button
+                  type="button"
+                  className="absolute right-10 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-300"
+                  onClick={() => fileInputRef.current?.click()}
+                  aria-label="Attach"
+                  title="Attach"
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path d="M21 12L10 23a6 6 0 01-8.49-8.49L12 4a4 4 0 116 6L8 22" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </button>
+                <button
+                  type="button"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-blue-500 hover:text-blue-400"
+                  onClick={send}
+                  aria-label="Send"
+                  title="Send"
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path d="M22 2L11 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </button>
+              </div>
             </div>
           </div>
           {attPreview && (

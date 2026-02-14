@@ -48,18 +48,18 @@ export default function AuthenticatedLayout({ header, children, fullWidth = fals
                             </div>
                         </div>
 
-<div className="hidden sm:ms-6 sm:flex sm:items-center">
-  <div className="relative ms-3">
-    <span className="inline-flex rounded-md">
-      <button
-        type="button"
-        className="inline-flex items-center rounded-md bg-gray-800 text-white px-4 py-2 text-sm font-medium leading-4 transition duration-200 ease-in-out hover:bg-gray-700 focus:outline-none"
-      >
-        {user.name}
-      </button>
-    </span>
-  </div>
-</div>
+                            <div className="hidden sm:ms-6 sm:flex sm:items-center">
+                            <div className="relative ms-3">
+                                <span className="inline-flex rounded-md">
+                                <button
+                                    type="button"
+                                    className="inline-flex items-center rounded-md bg-gray-800 text-white px-4 py-2 text-sm font-medium leading-4 transition duration-200 ease-in-out hover:bg-gray-700 focus:outline-none"
+                                >
+                                    {user.name}
+                                </button>
+                                </span>
+                            </div>
+                            </div>
 
 
                         <div className="-me-2 flex items-center sm:hidden">
