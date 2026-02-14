@@ -25,15 +25,47 @@ class ChatController extends Controller
 
         $pinned = [];
         if (in_array($role, ['buyer', 'merchant', 'midman', 'admin'], true)) {
-            $pinned = DB::table('conversations')
-                ->select(['id', 'type', 'title'])
-                ->whereIn('type', ['midman_gc', 'admin_gc'])
-                ->orderBy('type')
+            $latest = DB::table('messages')
+                ->select('conversation_id', DB::raw('MAX(created_at) as last_msg_at'), DB::raw('COUNT(*) as msg_count'))
+                ->groupBy('conversation_id');
+            $pinned = DB::table('conversations as c')
+                ->select([
+                    'c.id',
+                    'c.type',
+                    'c.title',
+                    'cp.last_read_at',
+                    DB::raw('COALESCE(lm.msg_count,0) as msg_count'),
+                    DB::raw('CASE WHEN COALESCE(lm.msg_count,0)=0 THEN 0 WHEN cp.last_read_at IS NULL OR lm.last_msg_at > cp.last_read_at THEN 1 ELSE 0 END AS unread')
+                ])
+                ->leftJoinSub($latest, 'lm', function ($j) {
+                    $j->on('lm.conversation_id', '=', 'c.id');
+                })
+                ->leftJoin('conversation_participants as cp', function ($j) use ($userId) {
+                    $j->on('cp.conversation_id', '=', 'c.id')->where('cp.user_id', '=', $userId);
+                })
+                ->whereIn('c.type', ['midman_gc', 'admin_gc'])
+                ->orderBy('c.type')
                 ->get();
         }
 
+        $latest = DB::table('messages')
+            ->select('conversation_id', DB::raw('MAX(created_at) as last_msg_at'), DB::raw('COUNT(*) as msg_count'))
+            ->groupBy('conversation_id');
         $direct = DB::table('conversations as c')
-            ->select(['c.id', 'c.title', 'u.id as other_id', 'u.name as other_name', 'u.role as other_role', 'u.avatar_path as other_avatar_path'])
+            ->select([
+                'c.id',
+                'c.title',
+                'u.id as other_id',
+                'u.name as other_name',
+                'u.role as other_role',
+                'u.avatar_path as other_avatar_path',
+                'cp1.last_read_at',
+                DB::raw('COALESCE(lm.msg_count,0) as msg_count'),
+                DB::raw('CASE WHEN COALESCE(lm.msg_count,0)=0 THEN 0 WHEN cp1.last_read_at IS NULL OR lm.last_msg_at > cp1.last_read_at THEN 1 ELSE 0 END AS unread')
+            ])
+            ->leftJoinSub($latest, 'lm', function ($j) {
+                $j->on('lm.conversation_id', '=', 'c.id');
+            })
             ->join('conversation_participants as cp1', function ($j) use ($userId) {
                 $j->on('cp1.conversation_id', '=', 'c.id')->where('cp1.user_id', '=', $userId);
             })
@@ -102,6 +134,12 @@ class ChatController extends Controller
             }
             return $row;
         }));
+
+        // mark as read for participants
+        DB::table('conversation_participants')
+            ->where('conversation_id', $conversationId)
+            ->where('user_id', $userId)
+            ->update(['last_read_at' => now(), 'updated_at' => now()]);
 
         if ($request->wantsJson()) {
             return response()->json([

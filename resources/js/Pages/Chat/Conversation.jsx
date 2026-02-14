@@ -64,11 +64,25 @@ export default function Conversation({ conversationId }) {
   }, [conversationId]);
 
   useEffect(() => {
+    const t = setInterval(() => {
+      if (!conv) return;
+      if (!window.Echo) {
+        load(meta.last_page ?? 1);
+      }
+    }, 4000);
+    return () => clearInterval(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [conv?.id, meta.last_page]);
+
+  useEffect(() => {
     if (!conv || !window.Echo) return;
     const id = conversationId;
     const channel = conv.type === 'direct'
       ? window.Echo.private(`conversation.${id}`)
       : window.Echo.channel(`gc.${id}`);
+    const publicFallback = conv.type === 'direct'
+      ? window.Echo.channel(`conversation.${id}`)
+      : null;
     const handler = (e) => {
       const msg = e.message;
       if (msg?.id && idsRef.current.has(msg.id)) return;
@@ -76,9 +90,11 @@ export default function Conversation({ conversationId }) {
       setMessages((prev) => [...prev, msg]);
     };
     channel.listen('.MessageSent', handler);
+    if (publicFallback) publicFallback.listen('.MessageSent', handler);
     return () => {
       try {
         channel.stopListening('.MessageSent', handler);
+        if (publicFallback) publicFallback.stopListening('.MessageSent', handler);
       } catch {}
     };
   }, [conv, conversationId]);

@@ -13,8 +13,8 @@ import Pusher from 'pusher-js';
 window.Pusher = Pusher;
 
 const key = import.meta.env.VITE_PUSHER_APP_KEY || 'localkey';
-const host = import.meta.env.VITE_PUSHER_HOST || window.location.hostname;
-const port = Number(import.meta.env.VITE_PUSHER_PORT || 6001);
+const host = import.meta.env.VITE_PUSHER_HOST || '127.0.0.1';
+const port = Number(import.meta.env.VITE_PUSHER_PORT || 8080);
 const scheme = import.meta.env.VITE_PUSHER_SCHEME || 'http';
 const cluster = import.meta.env.VITE_PUSHER_APP_CLUSTER || 'mt1';
 

@@ -23,12 +23,15 @@ class ChatMessageSent implements ShouldBroadcastNow
         $this->message = $message;
     }
 
-    public function broadcastOn(): Channel
+    public function broadcastOn(): array
     {
         if ($this->conversationType === 'direct') {
-            return new PrivateChannel('conversation.' . $this->conversationId);
+            return [
+                new PrivateChannel('conversation.' . $this->conversationId),
+                new Channel('conversation.' . $this->conversationId),
+            ];
         }
-        return new Channel('gc.' . $this->conversationId);
+        return [new Channel('gc.' . $this->conversationId)];
     }
 
     public function broadcastAs(): string

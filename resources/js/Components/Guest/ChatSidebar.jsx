@@ -120,12 +120,15 @@ export default function ChatSidebar() {
           const isGC = p.type === 'midman_gc' || p.type === 'admin_gc';
           const avatarSrc = isGC ? '/AccountsParadiseLogo.png' : null;
           return (
-            <Link key={p.id} href={`${base}/chat/${p.id}`} className="flex items-center gap-3 rounded px-3 py-2 hover:bg-neutral-900">
-              <Avatar src={avatarSrc} name={p.title} />
-              <div>
-                <div className="text-xs uppercase tracking-wide text-neutral-400">{p.type}</div>
-                <div className="font-medium">{p.title ?? (p.type === 'midman_gc' ? 'Midman GC' : 'Admin GC')}</div>
+            <Link key={p.id} href={`${base}/chat/${p.id}`} className="flex items-center justify-between gap-3 rounded px-3 py-2 hover:bg-neutral-900">
+              <div className="flex items-center gap-3">
+                <Avatar src={avatarSrc} name={p.title} />
+                <div>
+                  <div className="text-xs uppercase tracking-wide text-neutral-400">{p.type}</div>
+                  <div className={p.unread ? 'font-bold' : 'font-medium'}>{p.title ?? (p.type === 'midman_gc' ? 'Midman GC' : 'Admin GC')}</div>
+                </div>
               </div>
+              {p.unread ? <span className="h-2 w-2 rounded-full bg-blue-500" /> : <span className="h-2 w-2 rounded-full bg-transparent" />}
             </Link>
           );
         })}
@@ -135,12 +138,15 @@ export default function ChatSidebar() {
         {groups.direct_admins.map(c => {
           const avatarSrc = c.other_avatar_path ? `/storage/${c.other_avatar_path}` : null;
           return (
-            <Link key={c.id} href={`${base}/chat/${c.id}`} className="flex items-center gap-3 rounded px-3 py-2 hover:bg-neutral-900">
-              <Avatar src={avatarSrc} name={c.other_name} />
-              <div>
-                <div className="font-medium">{c.other_name}</div>
-                <div className="text-xs text-neutral-500">Admin</div>
+            <Link key={c.id} href={`${base}/chat/${c.id}`} className="flex items-center justify-between gap-3 rounded px-3 py-2 hover:bg-neutral-900">
+              <div className="flex items-center gap-3">
+                <Avatar src={avatarSrc} name={c.other_name} />
+                <div>
+                  <div className={c.unread ? 'font-bold' : 'font-medium'}>{c.other_name}</div>
+                  <div className="text-xs text-neutral-500">Admin</div>
+                </div>
               </div>
+              {c.unread ? <span className="h-2 w-2 rounded-full bg-blue-500" /> : <span className="h-2 w-2 rounded-full bg-transparent" />}
             </Link>
           );
         })}
@@ -150,12 +156,15 @@ export default function ChatSidebar() {
         {groups.direct_midmen.map(c => {
           const avatarSrc = c.other_avatar_path ? `/storage/${c.other_avatar_path}` : null;
           return (
-            <Link key={c.id} href={`${base}/chat/${c.id}`} className="flex items-center gap-3 rounded px-3 py-2 hover:bg-neutral-900">
-              <Avatar src={avatarSrc} name={c.other_name} />
-              <div>
-                <div className="font-medium">{c.other_name}</div>
-                <div className="text-xs text-neutral-500">Midman</div>
+            <Link key={c.id} href={`${base}/chat/${c.id}`} className="flex items-center justify-between gap-3 rounded px-3 py-2 hover:bg-neutral-900">
+              <div className="flex items-center gap-3">
+                <Avatar src={avatarSrc} name={c.other_name} />
+                <div>
+                  <div className={c.unread ? 'font-bold' : 'font-medium'}>{c.other_name}</div>
+                  <div className="text-xs text-neutral-500">Midman</div>
+                </div>
               </div>
+              {c.unread ? <span className="h-2 w-2 rounded-full bg-blue-500" /> : <span className="h-2 w-2 rounded-full bg-transparent" />}
             </Link>
           );
         })}
@@ -165,12 +174,15 @@ export default function ChatSidebar() {
         {(role === 'buyer' ? groups.direct_merchants : groups.direct_buyers).map(c => {
           const avatarSrc = c.other_avatar_path ? `/storage/${c.other_avatar_path}` : null;
           return (
-            <Link key={c.id} href={`${base}/chat/${c.id}`} className="flex items-center gap-3 rounded px-3 py-2 hover:bg-neutral-900">
-              <Avatar src={avatarSrc} name={c.other_name} />
-              <div>
-                <div className="font-medium">{c.other_name}</div>
-                <div className="text-xs text-neutral-500">{role === 'buyer' ? 'Seller' : 'Buyer'}</div>
+            <Link key={c.id} href={`${base}/chat/${c.id}`} className="flex items-center justify-between gap-3 rounded px-3 py-2 hover:bg-neutral-900">
+              <div className="flex items-center gap-3">
+                <Avatar src={avatarSrc} name={c.other_name} />
+                <div>
+                  <div className={c.unread ? 'font-bold' : 'font-medium'}>{c.other_name}</div>
+                  <div className="text-xs text-neutral-500">{role === 'buyer' ? 'Seller' : 'Buyer'}</div>
+                </div>
               </div>
+              {c.unread ? <span className="h-2 w-2 rounded-full bg-blue-500" /> : <span className="h-2 w-2 rounded-full bg-transparent" />}
             </Link>
           );
         })}
