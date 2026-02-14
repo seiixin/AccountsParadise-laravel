@@ -1,0 +1,189 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Glassmorphic + Sleek theme */
+:root {
+  --app-bg-start: #0b0f19;
+  --app-bg-end: #0d1117;
+  --app-accent-1: 91, 190, 255;
+  --app-accent-2: 139, 92, 246;
+}
+
+.bg-gradient-app {
+  background:
+    radial-gradient(1200px circle at 8% 0%, rgba(var(--app-accent-1), 0.12), transparent 35%),
+    radial-gradient(900px circle at 92% 0%, rgba(var(--app-accent-2), 0.10), transparent 40%),
+    linear-gradient(180deg, var(--app-bg-start), var(--app-bg-end));
+}
+
+.glass {
+  background: rgba(18, 20, 25, 0.55);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+.glass-soft {
+  background: rgba(24, 26, 32, 0.45);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.btn-primary-sleek {
+  background: linear-gradient(180deg, #ffffff, #dbe0e7);
+  color: #0b0f19;
+}
+
+.ring-accent {
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.06), 0 8px 24px rgba(0,0,0,0.35);
+}
+
+/* Square image helper */
+.square-box {
+  position: relative;
+  width: 100%;
+  padding-top: 100%;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+.square-box > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Landscape (16:9) image helper */
+.landscape-box {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+.landscape-box > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Light, clean card + inputs */
+.ap-card {
+  background: #14161c;
+  border: 1px solid #2a2f38;
+  border-radius: 1rem;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.35);
+}
+.ap-card:hover {
+  border-color: #363c47;
+}
+.ap-input {
+  background: #12141a;
+  border: 1px solid #2a2f38;
+  border-radius: 0.875rem;
+  color: #e5e7eb;
+}
+.ap-input::placeholder {
+  color: #9aa3b2;
+}
+.ap-pill {
+  border-radius: 9999px;
+}
+.ap-tag {
+  background: #1b1f27;
+  border: 1px solid #303543;
+  border-radius: 9999px;
+  color: #cbd5e1;
+}
+.ap-tag-active {
+  background: #ffffff;
+  color: #0b0f19;
+  border-color: #cfd6df;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+}
+.ap-panel {
+  background: #10131a;
+  border: 1px solid #272c35;
+  border-radius: 1rem;
+}
+.ap-btn-primary {
+  background: linear-gradient(180deg, #ffffff, #e9edf2);
+  color: #0b0f19;
+  border-radius: 9999px;
+  border: 1px solid #cfd6df;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+}
+.ap-btn-primary:hover {
+  filter: brightness(0.97);
+}
+
+/* Hero responsive helpers */
+.ap-hero-title {
+  font-size: clamp(1.25rem, 6vw, 2.5rem);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+.ap-hero-sub {
+  font-size: clamp(0.9rem, 2.6vw, 1rem);
+}
+.ap-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+/* Full-width hero background */
+.ap-hero-full {
+  min-height: clamp(240px, 46vh, 520px);
+}
+.ap-hero-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.6) contrast(0.95);
+}
+
+.ap-hero-dark {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,0.35), rgba(0,0,0,0.55));
+}
+
+/* Hero bottom fade overlay */
+.ap-fade-bottom {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 28%;
+  background: linear-gradient(to bottom, rgba(16,19,26,0), rgba(16,19,26,0.85) 60%, rgba(13,17,23,1));
+  border-bottom-left-radius: inherit;
+  border-bottom-right-radius: inherit;
+  pointer-events: none;
+}
+
+/* Global button rounding */
+button {
+  border-radius: 0.75rem !important;
+}
+
+/* Hide scrollbars but keep scroll functionality */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Tyme-inspired cyan theme */
