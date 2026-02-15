@@ -30,10 +30,10 @@ export default function Dashboard({ metrics: initialMetrics }) {
 
         <div className="rounded-lg border border-neutral-800 bg-neutral-950 p-6">
           <div className="text-neutral-400">Quick Actions</div>
-          <div className="mt-3 flex gap-3">
-            <a href={route('merchant.orders.index')} className="rounded border border-neutral-700 px-3 py-2">View Orders</a>
-            <a href={route('merchant.listings.index')} className="rounded border border-neutral-700 px-3 py-2">Manage Listings</a>
-            <a href="/store" className="rounded border border-neutral-700 px-3 py-2">Go to Store</a>
+          <div className="mt-3 flex flex-col sm:flex-row gap-3">
+            <a href={route('merchant.orders.index')} className="rounded border border-neutral-700 px-3 py-2 w-full sm:w-auto">View Orders</a>
+            <a href={route('merchant.listings.index')} className="rounded border border-neutral-700 px-3 py-2 w-full sm:w-auto">Manage Listings</a>
+            <a href="/store" className="rounded border border-neutral-700 px-3 py-2 w-full sm:w-auto">Go to Store</a>
           </div>
         </div>
 
@@ -108,9 +108,9 @@ function PayoutWidget() {
       </div>
       <div className="mt-6">
         <div className="text-neutral-400">Check Request Status</div>
-        <div className="mt-2 grid grid-cols-3 gap-3">
-          <input value={checkingId} onChange={(e) => setCheckingId(e.target.value)} placeholder="Enter Request ID" className="rounded border border-neutral-800 bg-neutral-950 px-3 py-2" />
-          <button onClick={check} disabled={checking} className="rounded bg-neutral-800 px-3 py-2 disabled:opacity-50">Check</button>
+          <div className="mt-2 grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <input value={checkingId} onChange={(e) => setCheckingId(e.target.value)} placeholder="Enter Request ID" className="rounded border border-neutral-800 bg-neutral-950 px-3 py-2 w-full" />
+            <button onClick={check} disabled={checking} className="rounded bg-neutral-800 px-3 py-2 disabled:opacity-50 w-full sm:w-auto">Check</button>
         </div>
       </div>
       {result && (
@@ -125,14 +125,14 @@ function PayoutWidget() {
       <div className={`${selectOpen ? 'fixed' : 'hidden'} inset-0 z-50 flex items-center justify-center bg-black/50`}>
         <div className="w-full max-w-3xl rounded-lg border border-neutral-800 bg-neutral-950 p-4">
           <div className="mb-3 text-lg font-semibold">Select completed orders</div>
-          <div className="mb-2 grid grid-cols-3 gap-3">
-            <select value={currency} onChange={(e) => setCurrency(e.target.value)} className="rounded border border-neutral-800 bg-neutral-900 px-3 py-2">
+          <div className="mb-2 grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <select value={currency} onChange={(e) => setCurrency(e.target.value)} className="rounded border border-neutral-800 bg-neutral-900 px-3 py-2 w-full">
               <option value="PHP">PHP</option>
               <option value="USD">USD</option>
             </select>
-            <div className="col-span-2 text-right text-sm">Total: {currency} {totalSelected}</div>
+            <div className="sm:col-span-2 text-right text-sm">Total: {currency} {totalSelected}</div>
           </div>
-          <div className="max-h-[50vh] overflow-y-auto rounded border border-neutral-800">
+          <div className="max-h-[50vh] overflow-y-auto overflow-x-auto rounded border border-neutral-800">
             <table className="min-w-full text-sm">
               <thead>
                 <tr className="text-left">
@@ -169,7 +169,7 @@ function PayoutWidget() {
               </tbody>
             </table>
           </div>
-          <div className="mt-3 flex items-center gap-2">
+          <div className="mt-3 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
             <button
               onClick={async () => {
                 if (!selectedIds.length) return;
@@ -180,11 +180,11 @@ function PayoutWidget() {
                 setOrders([]);
               }}
               disabled={!selectedIds.length}
-              className="rounded bg-blue-600 px-3 py-2 text-white disabled:opacity-50"
+              className="rounded bg-blue-600 px-3 py-2 text-white disabled:opacity-50 w-full sm:w-auto"
             >
               Submit Request
             </button>
-            <button onClick={() => { setSelectOpen(false); setSelectedIds([]); }} className="rounded bg-neutral-800 px-3 py-2">Close</button>
+            <button onClick={() => { setSelectOpen(false); setSelectedIds([]); }} className="rounded bg-neutral-800 px-3 py-2 w-full sm:w-auto">Close</button>
           </div>
         </div>
       </div>

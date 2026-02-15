@@ -57,6 +57,7 @@ export default function Navbar() {
             <span className="text-lg font-semibold hidden md:inline">AccountsParadise</span>
           </Link>
           <div className="hidden md:flex items-center gap-4 text-sm">
+            <Link href="/" className={`${(typeof window !== 'undefined' ? window.location.pathname : '') === '/' ? 'text-cyan-300 border-b-2 border-cyan-400 pb-1' : 'text-neutral-300 hover:text-white'}`}>Home</Link>
             <Link href="/store" className={`${(typeof window !== 'undefined' ? window.location.pathname : '')?.startsWith('/store') ? 'text-cyan-300 border-b-2 border-cyan-400 pb-1' : 'text-neutral-300 hover:text-white'}`}>Store</Link>
             <Link href="/games" className={`${(typeof window !== 'undefined' ? window.location.pathname : '')?.startsWith('/games') ? 'text-cyan-300 border-b-2 border-cyan-400 pb-1' : 'text-neutral-300 hover:text-white'}`}>Games</Link>
             <Link href="/contact" className={`${(typeof window !== 'undefined' ? window.location.pathname : '')?.startsWith('/contact') ? 'text-cyan-300 border-b-2 border-cyan-400 pb-1' : 'text-neutral-300 hover:text-white'}`}>Contact</Link>
@@ -123,6 +124,7 @@ export default function Navbar() {
       <div className={`${open ? 'block' : 'hidden'} md:hidden border-t border-neutral-800`}>
         <div className="mx-auto max-w-7xl px-4 py-3 text-sm">
           <div className="flex flex-col gap-2">
+            <Link href="/" className="rounded px-3 py-2 glass-soft">Home</Link>
             <Link href="/store" className="rounded px-3 py-2 glass-soft">Store</Link>
             <Link href="/games" className="rounded px-3 py-2 glass-soft">Games</Link>
             <Link href="/contact" className="rounded px-3 py-2 glass-soft">Contact</Link>

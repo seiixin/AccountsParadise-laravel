@@ -10,7 +10,7 @@ export default function OrderDetails({ order }) {
       <Head title="Merchant · Order Details" />
       <div className="mx-auto max-w-3xl p-4">
         <div className="rounded-lg border border-neutral-800 bg-neutral-950 p-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <div className="text-neutral-400">Order #</div>
               <div className="font-medium">{order.order_no}</div>

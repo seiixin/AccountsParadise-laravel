@@ -121,7 +121,7 @@ export default function PayoutRequests({ initial }) {
 
         <div className="glass-soft rounded-lg p-4">
           <div className="text-lg font-semibold mb-3">My Payouts</div>
-          <div className="overflow-hidden rounded-lg border border-neutral-800">
+          <div className="overflow-x-auto rounded-lg border border-neutral-800">
             <table className="min-w-full divide-y divide-neutral-800">
               <thead className="bg-neutral-900">
                 <tr>
@@ -155,11 +155,11 @@ export default function PayoutRequests({ initial }) {
               </tbody>
             </table>
           </div>
-          <div className="mt-3 flex items-center gap-3">
+          <div className="mt-3 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
             <button
               disabled={(meta.current_page ?? 1) <= 1}
               onClick={() => refresh(Math.max((meta.current_page ?? 1) - 1, 1))}
-              className="rounded border border-neutral-800 px-3 py-2 disabled:opacity-50"
+              className="rounded border border-neutral-800 px-3 py-2 disabled:opacity-50 w-full sm:w-auto"
             >
               Prev
             </button>
@@ -167,7 +167,7 @@ export default function PayoutRequests({ initial }) {
             <button
               disabled={(meta.current_page ?? 1) >= (meta.last_page ?? 1)}
               onClick={() => refresh((meta.current_page ?? 1) + 1)}
-              className="rounded border border-neutral-800 px-3 py-2 disabled:opacity-50"
+              className="rounded border border-neutral-800 px-3 py-2 disabled:opacity-50 w-full sm:w-auto"
             >
               Next
             </button>
@@ -176,9 +176,9 @@ export default function PayoutRequests({ initial }) {
 
         <div className="glass-soft rounded-lg p-4">
           <div className="text-lg font-semibold mb-3">Check Request Status</div>
-          <div className="grid grid-cols-3 gap-3">
-            <input value={checkingId} onChange={(e) => setCheckingId(e.target.value)} placeholder="Enter Request ID" className="rounded border border-neutral-800 bg-neutral-950 px-3 py-2" />
-            <button onClick={checkStatus} className="rounded bg-neutral-800 px-3 py-2">Check</button>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <input value={checkingId} onChange={(e) => setCheckingId(e.target.value)} placeholder="Enter Request ID" className="rounded border border-neutral-800 bg-neutral-950 px-3 py-2 w-full" />
+            <button onClick={checkStatus} className="rounded bg-neutral-800 px-3 py-2 w-full sm:w-auto">Check</button>
           </div>
           {checkResult && (
             <div className="mt-3 rounded border border-neutral-800 p-3">
@@ -194,14 +194,14 @@ export default function PayoutRequests({ initial }) {
       <div className={`${selectOpen ? 'fixed' : 'hidden'} inset-0 z-50 flex items-center justify-center bg-black/50`}>
         <div className="w-full max-w-3xl rounded-lg border border-neutral-800 bg-neutral-950 p-4">
           <div className="mb-3 text-lg font-semibold">Select completed orders</div>
-          <div className="mb-2 grid grid-cols-3 gap-3">
-            <select value={currency} onChange={(e) => setCurrency(e.target.value)} className="rounded border border-neutral-800 bg-neutral-900 px-3 py-2">
+          <div className="mb-2 grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <select value={currency} onChange={(e) => setCurrency(e.target.value)} className="rounded border border-neutral-800 bg-neutral-900 px-3 py-2 w-full">
               <option value="PHP">PHP</option>
               <option value="USD">USD</option>
             </select>
-            <div className="col-span-2 text-right text-sm">Total: {currency} {totalSelected}</div>
+            <div className="sm:col-span-2 text-right text-sm">Total: {currency} {totalSelected}</div>
           </div>
-          <div className="max-h-[50vh] overflow-y-auto rounded border border-neutral-800">
+          <div className="max-h-[50vh] overflow-y-auto overflow-x-auto rounded border border-neutral-800">
             <table className="min-w-full text-sm">
               <thead>
                 <tr className="text-left">
@@ -234,16 +234,16 @@ export default function PayoutRequests({ initial }) {
               </tbody>
             </table>
           </div>
-          <div className="mt-3 flex items-center gap-2">
-            <button onClick={submitSelected} disabled={!selectedIds.length} className="rounded bg-blue-600 px-3 py-2 text-white disabled:opacity-50">Submit Request</button>
-            <button onClick={() => { setSelectOpen(false); setSelectedIds([]); }} className="rounded bg-neutral-800 px-3 py-2">Close</button>
+          <div className="mt-3 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+            <button onClick={submitSelected} disabled={!selectedIds.length} className="rounded bg-blue-600 px-3 py-2 text-white disabled:opacity-50 w-full sm:w-auto">Submit Request</button>
+            <button onClick={() => { setSelectOpen(false); setSelectedIds([]); }} className="rounded bg-neutral-800 px-3 py-2 w-full sm:w-auto">Close</button>
           </div>
         </div>
       </div>
       <div className={`${viewOpen ? 'fixed' : 'hidden'} inset-0 z-50 flex items-center justify-center bg-black/50`}>
         <div className="w-full max-w-3xl rounded-lg border border-neutral-800 bg-neutral-950 p-4">
           <div className="mb-3 text-lg font-semibold">Orders in Payout #{viewId}</div>
-          <div className="max-h-[50vh] overflow-y-auto rounded border border-neutral-800">
+          <div className="max-h-[50vh] overflow-y-auto overflow-x-auto rounded border border-neutral-800">
             <table className="min-w-full text-sm">
               <thead>
                 <tr className="text-left">

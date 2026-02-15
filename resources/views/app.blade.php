@@ -7,6 +7,22 @@
         <title inertia>{{ config('app.name', 'Laravel') }}</title>
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
+        <meta name="description" content="Trusted Philippine gaming marketplace para sa accounts, boosting, at top-up. Lokal para sa Pilipinas — bili at benta nang ligtas at legit.">
+        <meta name="keywords" content="Philippines, gaming marketplace, buy accounts, boosting, top-up, legit">
+        <meta name="theme-color" content="#0a0a0a">
+
+        <meta property="og:type" content="website">
+        <meta property="og:site_name" content="{{ config('app.name') }}">
+        <meta property="og:title" content="{{ config('app.name') }}">
+        <meta property="og:description" content="Trusted Philippine gaming marketplace para sa accounts, boosting, at top-up. Lokal para sa Pilipinas — bili at benta nang ligtas at legit.">
+        <meta property="og:image" content="/HomeBanner.png">
+        <meta property="og:url" content="{{ url()->current() }}">
+
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:title" content="{{ config('app.name') }}">
+        <meta name="twitter:description" content="Trusted Philippine gaming marketplace para sa accounts, boosting, at top-up. Lokal para sa Pilipinas — bili at benta nang ligtas at legit.">
+        <meta name="twitter:image" content="/HomeBanner.png">
+
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />

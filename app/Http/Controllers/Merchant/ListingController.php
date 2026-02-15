@@ -23,6 +23,16 @@ class ListingController extends Controller
             ->orderByDesc('is_featured')
             ->orderByDesc('created_at');
 
+        if ($request->filled('type')) {
+            $type = $request->input('type');
+            if (in_array($type, ['account', 'item', 'boosting', 'topup'], true)) {
+                $query->where('type', $type);
+            }
+        }
+        if ($search = $request->string('q')->toString()) {
+            $query->where('title', 'like', '%' . $search . '%');
+        }
+
         if ($request->wantsJson()) {
             return response()->json($query->paginate((int) $request->input('per_page', 20)));
         }
@@ -44,7 +54,7 @@ class ListingController extends Controller
             'price' => ['required', 'numeric'],
             'category_id' => ['required', 'exists:categories,id'],
             'currency' => ['nullable', 'string', 'max:10'],
-            'type' => ['required', 'in:account,item'],
+            'type' => ['required', 'in:account,item,boosting,topup'],
             'cover_image' => ['nullable', 'file', 'image', 'max:10240'],
             'images' => ['nullable', 'array'],
             'images.*' => ['file', 'image', 'max:10240'],
@@ -107,7 +117,7 @@ class ListingController extends Controller
             'price' => ['sometimes', 'numeric'],
             'currency' => ['sometimes', 'string', 'max:10'],
             'category_id' => ['sometimes', 'nullable', 'exists:categories,id'],
-            'type' => ['sometimes', 'in:account,item'],
+            'type' => ['sometimes', 'in:account,item,boosting,topup'],
         ]);
 
         $listing = Listing::where('merchant_id', auth()->id()) // ✅ FIX

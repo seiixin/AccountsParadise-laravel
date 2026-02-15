@@ -128,7 +128,7 @@ export default function Edit() {
                     Edit
                   </button>
                 ) : (
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                     <input
                       type="file"
                       accept="image/*"
@@ -142,9 +142,10 @@ export default function Edit() {
                           setAvatarModalOpen(true);
                         }
                       }}
+                      className="rounded border border-neutral-800 bg-neutral-950 px-3 py-2 w-full sm:w-auto"
                     />
-                    <button onClick={() => saveField('avatar')} className="rounded bg-blue-600 px-3 py-2 text-white" disabled={saving}>Save</button>
-                    <button onClick={() => { setAvatarEdit(false); setAvatar(null); }} className="rounded bg-neutral-800 px-3 py-2">Cancel</button>
+                    <button onClick={() => saveField('avatar')} className="rounded bg-blue-600 px-3 py-2 text-white w-full sm:w-auto" disabled={saving}>Save</button>
+                    <button onClick={() => { setAvatarEdit(false); setAvatar(null); }} className="rounded bg-neutral-800 px-3 py-2 w-full sm:w-auto">Cancel</button>
                   </div>
                 )}
               </div>
@@ -158,10 +159,10 @@ export default function Edit() {
                   <button onClick={() => setNameEdit(true)} className="rounded glass-soft px-3 py-2">Edit</button>
                 </div>
               ) : (
-                <div className="mt-2 flex items-center gap-2">
-                  <input value={name} onChange={(e) => setName(e.target.value)} className="rounded border border-neutral-800 bg-neutral-950 px-3 py-2 flex-1" />
-                  <button onClick={() => saveField('name')} className="rounded bg-blue-600 px-3 py-2 text-white" disabled={saving}>Save</button>
-                  <button onClick={() => { setName(viewUser.name ?? ''); setNameEdit(false); }} className="rounded bg-neutral-800 px-3 py-2">Cancel</button>
+                <div className="mt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                  <input value={name} onChange={(e) => setName(e.target.value)} className="rounded border border-neutral-800 bg-neutral-950 px-3 py-2 w-full sm:flex-1" />
+                  <button onClick={() => saveField('name')} className="rounded bg-blue-600 px-3 py-2 text-white w-full sm:w-auto" disabled={saving}>Save</button>
+                  <button onClick={() => { setName(viewUser.name ?? ''); setNameEdit(false); }} className="rounded bg-neutral-800 px-3 py-2 w-full sm:w-auto">Cancel</button>
                 </div>
               )}
             </div>
@@ -174,10 +175,10 @@ export default function Edit() {
                   <button onClick={() => setUsernameEdit(true)} className="rounded glass-soft px-3 py-2">Edit</button>
                 </div>
               ) : (
-                <div className="mt-2 flex items-center gap-2">
-                  <input value={username} onChange={(e) => setUsername(e.target.value)} className="rounded border border-neutral-800 bg-neutral-950 px-3 py-2 flex-1" />
-                  <button onClick={() => saveField('username')} className="rounded bg-blue-600 px-3 py-2 text-white" disabled={saving}>Save</button>
-                  <button onClick={() => { setUsername(viewUser.username ?? ''); setUsernameEdit(false); }} className="rounded bg-neutral-800 px-3 py-2">Cancel</button>
+                <div className="mt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                  <input value={username} onChange={(e) => setUsername(e.target.value)} className="rounded border border-neutral-800 bg-neutral-950 px-3 py-2 w-full sm:flex-1" />
+                  <button onClick={() => saveField('username')} className="rounded bg-blue-600 px-3 py-2 text-white w-full sm:w-auto" disabled={saving}>Save</button>
+                  <button onClick={() => { setUsername(viewUser.username ?? ''); setUsernameEdit(false); }} className="rounded bg-neutral-800 px-3 py-2 w-full sm:w-auto">Cancel</button>
                 </div>
               )}
             </div>
@@ -190,10 +191,10 @@ export default function Edit() {
                   <button onClick={() => setEmailEdit(true)} className="rounded glass-soft px-3 py-2">Edit</button>
                 </div>
               ) : (
-                <div className="mt-2 flex items-center gap-2">
-                  <input value={email} onChange={(e) => setEmail(e.target.value)} className="rounded border border-neutral-800 bg-neutral-950 px-3 py-2 flex-1" />
-                  <button onClick={() => saveField('email')} className="rounded bg-blue-600 px-3 py-2 text-white" disabled={saving}>Save</button>
-                  <button onClick={() => { setEmail(viewUser.email ?? ''); setEmailEdit(false); }} className="rounded bg-neutral-800 px-3 py-2">Cancel</button>
+                <div className="mt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                  <input value={email} onChange={(e) => setEmail(e.target.value)} className="rounded border border-neutral-800 bg-neutral-950 px-3 py-2 w-full sm:flex-1" />
+                  <button onClick={() => saveField('email')} className="rounded bg-blue-600 px-3 py-2 text-white w-full sm:w-auto" disabled={saving}>Save</button>
+                  <button onClick={() => { setEmail(viewUser.email ?? ''); setEmailEdit(false); }} className="rounded bg-neutral-800 px-3 py-2 w-full sm:w-auto">Cancel</button>
                 </div>
               )}
             </div>

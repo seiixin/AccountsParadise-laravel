@@ -40,18 +40,18 @@ export default function ListingEdit({ listing, images: initialImages }) {
     <MerchantLayout title="Edit Listing" header={<h2 className="text-xl font-semibold">Edit Listing</h2>}>
       <Head title={`Edit · ${listing.title}`} />
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-        <div className="rounded-lg border border-neutral-800 bg-neutral-950 p-4">
-          <div className="text-sm text-neutral-400">Cover Image</div>
+        <div className="rounded-lg border border-neutral-800 bg-neutral-950 p-4 text-white">
+          <div className="text-sm text-white">Cover Image</div>
           <div className="landscape-box bg-neutral-800 mt-2">
             {listing.cover_image_path ? <img src={`/storage/${listing.cover_image_path}`} alt={listing.title} /> : null}
           </div>
         </div>
-        <div className="rounded-lg border border-neutral-800 bg-neutral-950 p-4">
-          <div className="text-sm text-neutral-400">Gallery Images ({images.length}/10)</div>
+        <div className="rounded-lg border border-neutral-800 bg-neutral-950 p-4 text-white">
+          <div className="text-sm text-white">Gallery Images ({images.length}/10)</div>
           <div className="mt-2">
             <input type="file" multiple accept="image/*" onChange={uploadImages} disabled={uploading || images.length >= 10} />
           </div>
-          <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-3">
+          <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 md:grid-cols-3">
             {images.map((img) => (
               <div key={img.id} className="rounded border border-neutral-800 bg-neutral-900 p-2">
                 <div className="landscape-box bg-neutral-800">
@@ -63,7 +63,7 @@ export default function ListingEdit({ listing, images: initialImages }) {
                 </div>
               </div>
             ))}
-            {!images.length && <div className="text-neutral-400">No images</div>}
+            {!images.length && <div className="text-white">No images</div>}
           </div>
         </div>
       </div>

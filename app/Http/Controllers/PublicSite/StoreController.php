@@ -24,7 +24,7 @@ class StoreController extends Controller
         }
         if ($request->filled('type')) {
             $type = $request->string('type')->toString();
-            if (in_array($type, ['account', 'item'], true)) {
+            if (in_array($type, ['account', 'item', 'boosting', 'topup'], true)) {
                 $q->where('listings.type', $type);
             }
         }
@@ -47,6 +47,7 @@ class StoreController extends Controller
         return Inertia::render('Store', [
             'initial' => $listings,
             'categories' => $categories,
+            'selectedType' => isset($type) && in_array($type, ['account', 'item', 'boosting', 'topup'], true) ? $type : '',
         ]);
     }
 }

@@ -8,6 +8,8 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\LoginAlert;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -34,6 +36,11 @@ class AuthenticatedSessionController extends Controller
 
         // Session fixation protection
         $request->session()->regenerate();
+
+        $ip = $request->ip() ?? 'Unknown';
+        $agent = $request->header('User-Agent') ?? 'Unknown';
+        $time = now()->toDateTimeString();
+        Mail::to(Auth::user()->email)->send(new LoginAlert($ip, $agent, $time));
 
         $role = Auth::user()->role;
 

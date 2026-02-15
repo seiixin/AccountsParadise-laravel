@@ -53,7 +53,7 @@ function StoreGrid({ items, categories }) {
   );
 }
 
-export default function Store({ initial, categories }) {
+export default function Store({ initial, categories, selectedType = '' }) {
   const [data, setData] = useState(initial?.data ?? []);
   const [heroItems, setHeroItems] = useState(initial?.data ?? []);
   const [meta, setMeta] = useState(() => {
@@ -66,7 +66,18 @@ export default function Store({ initial, categories }) {
   });
   const [q, setQ] = useState('');
   const [categoryId, setCategoryId] = useState('');
-  const [type, setType] = useState('');
+  const [type, setType] = useState(selectedType || '');
+
+  useEffect(() => {
+    try {
+      if ((window.location.hash || '') === '#listings') {
+        setTimeout(() => {
+          const el = document.getElementById('listings');
+          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 0);
+      }
+    } catch {}
+  }, []);
 
   async function refresh(page = 1) {
     const res = await axios.get('/store', {
@@ -130,6 +141,8 @@ export default function Store({ initial, categories }) {
                 <option value="">All types</option>
                 <option value="item">Item</option>
                 <option value="account">Account</option>
+                <option value="boosting">Boosting Service</option>
+                <option value="topup">Top-Up</option>
               </select>
             </div>
             <div>
@@ -143,7 +156,9 @@ export default function Store({ initial, categories }) {
         </div>
       </div>
       <div className="mt-6">
-        <StoreGrid items={data} categories={categories} />
+        <div id="listings">
+          <StoreGrid items={data} categories={categories} />
+        </div>
         <div className="mt-4 flex items-center gap-2">
           <button
             disabled={(meta.current_page ?? 1) <= 1}

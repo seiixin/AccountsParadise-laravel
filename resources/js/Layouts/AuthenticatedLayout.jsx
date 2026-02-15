@@ -2,7 +2,7 @@ import Dropdown from '@/Components/Dropdown';
 import NavLink from '@/Components/NavLink';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 import { Link, usePage } from '@inertiajs/react';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 export default function AuthenticatedLayout({ header, children, fullWidth = false, hideGlobalInboxButton = false }) {
@@ -21,6 +21,37 @@ export default function AuthenticatedLayout({ header, children, fullWidth = fals
 
     const [showingNavigationDropdown, setShowingNavigationDropdown] =
         useState(false);
+    const [userOpen, setUserOpen] = useState(false);
+    const dropdownRef = useRef(null);
+    const userBtnRef = useRef(null);
+    const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0 });
+
+    useEffect(() => {
+        const onDocClick = (e) => {
+            const inDropdown = dropdownRef.current && dropdownRef.current.contains(e.target);
+            const inButton = userBtnRef.current && userBtnRef.current.contains(e.target);
+            if (inDropdown || inButton) return;
+            setUserOpen(false);
+        };
+        const onKey = (e) => {
+            if (e.key === 'Escape') setUserOpen(false);
+        };
+        document.addEventListener('click', onDocClick);
+        document.addEventListener('keydown', onKey);
+        return () => {
+            document.removeEventListener('click', onDocClick);
+            document.removeEventListener('keydown', onKey);
+        };
+    }, []);
+
+    useEffect(() => {
+        if (userOpen && userBtnRef.current) {
+            const rect = userBtnRef.current.getBoundingClientRect();
+            const top = rect.bottom + window.scrollY + 8;
+            const left = rect.right + window.scrollX - 176;
+            setDropdownPos({ top, left });
+        }
+    }, [userOpen]);
 
     return (
         <div className="min-h-screen bg-gradient-app text-neutral-100">
@@ -49,16 +80,24 @@ export default function AuthenticatedLayout({ header, children, fullWidth = fals
                         </div>
 
                             <div className="hidden sm:ms-6 sm:flex sm:items-center">
-                            <div className="relative ms-3">
-                                <span className="inline-flex rounded-md">
-                                <button
-                                    type="button"
-                                    className="inline-flex items-center rounded-md bg-gray-800 text-white px-4 py-2 text-sm font-medium leading-4 transition duration-200 ease-in-out hover:bg-gray-700 focus:outline-none"
-                                >
-                                    {user.name}
-                                </button>
-                                </span>
-                            </div>
+                                <div className="relative ms-3">
+                                    <button ref={userBtnRef} className="rounded px-3 py-2 text-sm glass-soft text-white" onClick={() => setUserOpen((v) => !v)} aria-expanded={userOpen}>
+                                        {user.name}
+                                    </button>
+                                    {createPortal(
+                                        <div
+                                            ref={dropdownRef}
+                                            className={`${userOpen ? 'block' : 'hidden'} w-44 rounded glass-soft p-2 text-sm`}
+                                            style={{ position: 'fixed', top: dropdownPos.top, left: dropdownPos.left, zIndex: 2147483647 }}
+                                        >
+                                            <Link href={route('profile.edit')} className="block rounded px-2 py-1 hover:bg-neutral-800 text-white">Profile</Link>
+                                            <Link href={route('logout')} method="post" as="button" className="mt-1 block w-full rounded px-2 py-1 text-left hover:bg-neutral-800 text-white">
+                                                Logout
+                                            </Link>
+                                        </div>,
+                                        document.body
+                                    )}
+                                </div>
                             </div>
 
 

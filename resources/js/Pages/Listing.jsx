@@ -63,7 +63,7 @@ export default function Listing({ listing, images = [] }) {
     <PublicLayout fullWidth>
       <Head title={`Listing · ${listing.title}`} />
       <div className="grid grid-cols-1 gap-3 md:gap-6 md:grid-cols-2">
-        <div className="rounded-lg border border-neutral-800 bg-neutral-950 p-3 md:p-4">
+        <div className="rounded-lg border border-neutral-800 bg-neutral-950 p-3 md:p-4 text-white">
           <div className="relative">
             <div className="square-box bg-neutral-800 overflow-hidden">
               <div className="absolute inset-0">
@@ -109,17 +109,17 @@ export default function Listing({ listing, images = [] }) {
             )}
           </div>
         </div>
-        <div className="rounded-lg border border-neutral-800 bg-neutral-950 p-3 md:p-4">
+        <div className="rounded-lg border border-neutral-800 bg-neutral-950 p-3 md:p-4 text-white">
           <div id="listing-details-portal" className="hidden lg:block relative rounded-lg border border-neutral-800 bg-neutral-900 p-2" />
-          <div className="text-sm text-neutral-400">ID #{listing.id}</div>
+          <div className="text-sm text-white">ID #{listing.id}</div>
           <div className="mt-1 text-2xl font-semibold">{listing.title}</div>
-          <div className="mt-2 text-neutral-400">{listing.description || 'No description'}</div>
+          <div className="mt-2 text-white">{listing.description || 'No description'}</div>
           <div className="mt-3 flex items-center gap-3">
             <div className="h-9 w-9 rounded-full bg-neutral-800 flex items-center justify-center text-sm font-semibold">
               {(listing.merchant_name || 'U')[0]}
             </div>
             <div>
-              <div className="text-xs text-neutral-400">Seller</div>
+              <div className="text-xs text-white">Seller</div>
               <button
                 type="button"
                 className="font-medium hover:underline"
@@ -162,29 +162,29 @@ export default function Listing({ listing, images = [] }) {
           <div className="w-full max-w-4xl rounded-2xl glass-soft p-6">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div className="ap-card p-4">
-                <div className="text-sm uppercase tracking-wide text-neutral-400">Offer</div>
-                <div className="mt-2 font-semibold text-lg">{listing.title}</div>
+                <div className="text-sm uppercase tracking-wide text-white">Offer</div>
+                <div className="mt-2 font-semibold text-lg text-white">{listing.title}</div>
                 <div className="landscape-box mt-3 bg-neutral-800">
                   {listing.cover_image_path ? <img src={`/storage/${listing.cover_image_path}`} alt={listing.title} /> : null}
                 </div>
                 <div className="mt-3">
-                  <div className="text-neutral-400">Price</div>
-                  <div className="text-xl font-semibold">{listing.currency} {listing.price}</div>
+                  <div className="text-white">Price</div>
+                  <div className="text-xl font-semibold text-white">{listing.currency} {listing.price}</div>
                 </div>
               </div>
               <div className="ap-card p-4">
-                <div className="text-sm uppercase tracking-wide text-neutral-400">Buy Now</div>
+                <div className="text-sm uppercase tracking-wide text-white">Buy Now</div>
                 <div className="mt-3">
-                  <div className="text-sm text-neutral-300 mb-1">Valid ID</div>
+                  <div className="text-sm text-white mb-1">Valid ID</div>
                   <div className="mb-2 flex items-center gap-2">
                     <button className="rounded border border-neutral-700 px-3 py-2" onClick={() => setCameraOpen(true)}>Use Camera</button>
-                    {idImage && <div className="text-xs text-neutral-400">ID ready</div>}
+                    {idImage && <div className="text-xs text-white">ID ready</div>}
                   </div>
                   <input type="file" accept="image/*" onChange={(e) => setIdImage(e.target.files?.[0] ?? null)} className="ap-input w-full px-3 py-2" />
                 {errors?.id_image && <div className="mt-1 text-xs text-red-400">{[].concat(errors.id_image).join(', ')}</div>}
                 </div>
                 <div className="mt-4">
-                  <div className="text-sm text-neutral-300 mb-1">Payment</div>
+                  <div className="text-sm text-white mb-1">Payment</div>
                   <select value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)} className="ap-input w-full px-3 py-2">
                     <option>GCash</option>
                     <option>Bank Transfer</option>
@@ -201,7 +201,7 @@ export default function Listing({ listing, images = [] }) {
                   <button className="ap-btn-primary px-4 py-2" disabled={submitting || !paymentRef} onClick={confirmPurchase}>{submitting ? 'Submitting...' : 'Confirm Purchase'}</button>
                 </div>
               {errors?.message && <div className="mt-2 text-xs text-red-400">{errors.message}</div>}
-                <div className="mt-2 text-xs text-neutral-500">Your purchase goes to Admin/Midman verification.</div>
+                <div className="mt-2 text-xs text-white">Your purchase goes to Admin/Midman verification.</div>
               </div>
             </div>
           </div>
