@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 
 function roleBase(role) {
@@ -20,6 +20,8 @@ export default function ChatSidebar() {
   const [roleUsers, setRoleUsers] = useState([]);
   const [targetId, setTargetId] = useState(null);
   const [search, setSearch] = useState('');
+  const subsRef = useRef(new Map());
+  const pollRef = useRef(null);
 
   function csrf() {
     const m = document.querySelector('meta[name="csrf-token"]');
@@ -42,6 +44,70 @@ export default function ChatSidebar() {
     }).finally(() => refresh(1));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    const handler = () => refresh(1);
+    window.addEventListener('ap-inbox-refresh', handler);
+    return () => {
+      window.removeEventListener('ap-inbox-refresh', handler);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (pollRef.current) {
+      clearInterval(pollRef.current);
+      pollRef.current = null;
+    }
+    pollRef.current = setInterval(() => {
+      refresh(1);
+    }, 8000);
+    const onVis = () => {
+      if (document.visibilityState === 'visible') {
+        refresh(1);
+      }
+    };
+    document.addEventListener('visibilitychange', onVis);
+    return () => {
+      if (pollRef.current) {
+        clearInterval(pollRef.current);
+        pollRef.current = null;
+      }
+      document.removeEventListener('visibilitychange', onVis);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    const isGC = (p) => p.type === 'midman_gc' || p.type === 'admin_gc';
+    if (!window.Echo) return;
+    const currentIds = new Set(pinned.filter(isGC).map(p => p.id));
+    subsRef.current.forEach((entry, id) => {
+      if (!currentIds.has(id)) {
+        try {
+          entry.channel.stopListening('.MessageSent', entry.handler);
+        } catch {}
+        subsRef.current.delete(id);
+      }
+    });
+    pinned.filter(isGC).forEach(p => {
+      if (subsRef.current.has(p.id)) return;
+      const channel = window.Echo.channel(`gc.${p.id}`);
+      const handler = () => {
+        refresh(1);
+      };
+      channel.listen('.MessageSent', handler);
+      subsRef.current.set(p.id, { channel, handler });
+    });
+    return () => {
+      subsRef.current.forEach(({ channel, handler }) => {
+        try {
+          channel.stopListening('.MessageSent', handler);
+        } catch {}
+      });
+      subsRef.current.clear();
+    };
+  }, [pinned]);
 
   async function loadRoleUsers(r) {
     const res = await axios.get(`${base}/chat/users`, { params: { role: r }, headers: { Accept: 'application/json' } });

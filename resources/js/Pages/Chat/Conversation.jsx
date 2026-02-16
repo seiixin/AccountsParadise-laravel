@@ -56,6 +56,7 @@ export default function Conversation({ conversationId }) {
     setMessages(data);
     idsRef.current = new Set(data.map(m => m.id));
     setMeta(list.meta ?? { current_page: list.current_page ?? 1, last_page: list.last_page ?? 1 });
+    try { window.dispatchEvent(new CustomEvent('ap-inbox-refresh')); } catch {}
   }
 
   useEffect(() => {

@@ -108,6 +108,10 @@ class ChatController extends Controller
             abort_unless($exists, 403);
         } else {
             abort_unless(in_array($role, ['buyer', 'merchant', 'midman', 'admin'], true), 403);
+            DB::table('conversation_participants')->updateOrInsert(
+                ['conversation_id' => $conversationId, 'user_id' => $userId],
+                ['role' => $role, 'joined_at' => now(), 'updated_at' => now(), 'created_at' => now()]
+            );
         }
 
         $participants = DB::table('conversation_participants as cp')
@@ -337,6 +341,17 @@ class ChatController extends Controller
             DB::table('conversation_participants')->updateOrInsert(
                 ['conversation_id' => $adminId, 'user_id' => $u->id],
                 ['role' => 'admin', 'joined_at' => now(), 'updated_at' => now(), 'created_at' => now()]
+            );
+        }
+
+        if (in_array($myRole, ['buyer', 'merchant', 'midman', 'admin'], true)) {
+            DB::table('conversation_participants')->updateOrInsert(
+                ['conversation_id' => $adminId, 'user_id' => $me],
+                ['role' => $myRole, 'joined_at' => now(), 'updated_at' => now(), 'created_at' => now()]
+            );
+            DB::table('conversation_participants')->updateOrInsert(
+                ['conversation_id' => $midmanId, 'user_id' => $me],
+                ['role' => $myRole, 'joined_at' => now(), 'updated_at' => now(), 'created_at' => now()]
             );
         }
 

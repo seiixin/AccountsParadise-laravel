@@ -23,6 +23,7 @@ export default function Listing({ listing, images = [] }) {
   const [errors, setErrors] = useState({});
   const [cameraOpen, setCameraOpen] = useState(false);
   const [faceCamOpen, setFaceCamOpen] = useState(false);
+  const [qrOpen, setQrOpen] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -172,15 +173,18 @@ export default function Listing({ listing, images = [] }) {
                 </div>
                 <div className="mt-3">
                   <div className="text-white">Price</div>
-                  <div className="text-xl font-semibold text-white">{listing.currency} {listing.price}</div>
-                  <div className="mt-2 text-sm text-neutral-300">Midman Fee: ₱{(() => {
+                  <div className="text-xl font-semibold text-white">{listing.currency} {(() => { const a = Number(listing.price) || 0; return a.toFixed(2); })()}</div>
+                  <div className="my-3 border-t border-neutral-700" />
+                  <div className="text-lg text-neutral-300">Midman Fee: ₱{(() => {
                     const amt = Number(listing.price) || 0;
                     if (amt >= 100 && amt <= 999) return 20;
                     if (amt >= 1000 && amt <= 4999) return Math.round(amt * 0.05);
                     if (amt >= 5000 && amt <= 9999) return Math.round(amt * 0.04);
                     if (amt >= 10000) return Math.round(amt * 0.03);
                     return 0;
-                  })()} · Total: ₱{(() => {
+                  })()}</div>
+                  <div className="my-3 border-t border-neutral-700" />
+                  <div className="text-xl font-semibold text-white">Total: ₱{(() => {
                     const amt = Number(listing.price) || 0;
                     const fee = (amt >= 100 && amt <= 999) ? 20 : (amt >= 1000 && amt <= 4999) ? Math.round(amt * 0.05) : (amt >= 5000 && amt <= 9999) ? Math.round(amt * 0.04) : (amt >= 10000) ? Math.round(amt * 0.03) : 0;
                     return amt + fee;
@@ -203,7 +207,9 @@ export default function Listing({ listing, images = [] }) {
                   <select value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)} className="ap-input w-full px-3 py-2">
                     <option>GCash</option>
                     <option>InstaPay</option>
-                    <option>Bank Transfer</option>
+                    <option>BDO</option>
+                    <option>ShopeePay</option>
+                    <option>Maya</option>
                   </select>
                   <input value={paymentRef} onChange={(e) => setPaymentRef(e.target.value)} placeholder="Reference / Transaction ID" className="ap-input w-full px-3 py-2 mt-2" />
                 {errors?.payment_reference && <div className="mt-1 text-xs text-red-400">{[].concat(errors.payment_reference).join(', ')}</div>}
@@ -223,6 +229,7 @@ export default function Listing({ listing, images = [] }) {
                 <div className="mt-6 flex items-center gap-3">
                   <button className="rounded px-4 py-2 glass-soft" onClick={() => setOpen(false)}>Cancel</button>
                   <button className="ap-btn-primary px-4 py-2" disabled={submitting || !paymentRef} onClick={confirmPurchase}>{submitting ? 'Submitting...' : 'Confirm Purchase'}</button>
+                  <button className="rounded px-4 py-2 bg-amber-600 text-white" onClick={() => setQrOpen(true)}>Show QR</button>
                 </div>
               {errors?.message && <div className="mt-2 text-xs text-red-400">{errors.message}</div>}
                 <div className="mt-2 text-xs text-white">Your purchase goes to Admin/Midman verification.</div>
@@ -231,6 +238,23 @@ export default function Listing({ listing, images = [] }) {
           </div>
         </div>
       )}
+      {qrOpen &&
+        createPortal(
+          <div className="fixed inset-0 z-[100001] flex items-center justify-center bg-black/70">
+            <div className="w-full max-w-xl rounded-2xl glass-soft p-6 text-white">
+              <div className="text-lg font-semibold">Scan to Pay</div>
+              <div className="mt-3 rounded-lg overflow-hidden bg-neutral-900">
+                <img src="/QR.jpg" alt="QR" className="w-full h-auto object-contain" />
+              </div>
+              <div className="mt-6 flex items-center justify-end gap-3">
+                <button className="rounded px-4 py-2 glass-soft" onClick={() => setQrOpen(false)}>Cancel</button>
+                <button className="ap-btn-primary px-4 py-2" onClick={() => setQrOpen(false)}>Done Payment</button>
+              </div>
+            </div>
+          </div>,
+          document.body
+        )
+      }
       <IdCapture open={cameraOpen} onClose={() => setCameraOpen(false)} onCapture={(file) => setIdImage(file)} facingMode="environment" />
       <IdCapture open={faceCamOpen} onClose={() => setFaceCamOpen(false)} onCapture={(file) => setFaceImage(file)} facingMode="user" />
     </PublicLayout>
