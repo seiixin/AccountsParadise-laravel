@@ -142,6 +142,10 @@ export default function Listing({ listing, images = [] }) {
                     }
                     const payload = { target_user_id: listing.merchant_id };
                     if (role === 'merchant') {
+                      if (Number(listing.merchant_id) === Number(user.id)) {
+                        window.location.href = '/merchant/inbox';
+                        return;
+                      }
                       const res = await axios.post(route('merchant.chat.start-with'), payload, { headers: { Accept: 'application/json' }, withCredentials: true });
                       const cid = res?.data?.conversation_id;
                       if (cid) window.location.href = `/merchant/chat/${cid}`;

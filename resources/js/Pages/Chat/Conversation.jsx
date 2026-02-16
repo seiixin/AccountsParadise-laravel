@@ -226,7 +226,6 @@ export default function Conversation({ conversationId }) {
               </div>
               <div>
                 <div className="text-sm font-semibold">{conv?.title ?? (other?.name ?? 'Conversation')}</div>
-                <div className="text-xs text-neutral-400">Active now</div>
               </div>
             </div>
             <button
@@ -253,7 +252,6 @@ export default function Conversation({ conversationId }) {
               </div>
               <div>
                 <div className="text-sm font-semibold">{conv?.title ?? (other?.name ?? 'Conversation')}</div>
-                <div className="text-xs text-neutral-400">Active now</div>
               </div>
             </div>
           </div>
