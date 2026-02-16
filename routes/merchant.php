@@ -8,7 +8,7 @@ use App\Http\Controllers\Merchant\OrderDeliveryController;
 use App\Http\Controllers\Merchant\PayoutRequestController;
 use App\Http\Controllers\Chat\ChatController;
 
-Route::middleware(['auth', 'role:merchant'])->prefix('merchant')->name('merchant.')->group(function () {
+Route::middleware(['auth', 'verified', 'role:merchant'])->prefix('merchant')->name('merchant.')->group(function () {
     Route::get('/dashboard', [MerchantController::class, 'dashboard'])->name('dashboard');
 
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');

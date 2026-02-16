@@ -8,7 +8,7 @@ use App\Http\Controllers\Buyer\OrderDisputeController;
 use App\Http\Controllers\Buyer\PurchaseController;
 use App\Http\Controllers\Chat\ChatController;
 
-Route::middleware(['auth', 'role:buyer'])
+Route::middleware(['auth', 'verified', 'role:buyer'])
     ->prefix('buyer')
     ->name('buyer.')
     ->group(function () {

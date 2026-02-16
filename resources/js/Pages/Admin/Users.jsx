@@ -26,6 +26,8 @@ export default function Users({ initial }) {
     const [open, setOpen] = useState(false);
     const [selected, setSelected] = useState(null);
     const [form, setForm] = useState({});
+    const [confirmOpen, setConfirmOpen] = useState(false);
+    const [confirmId, setConfirmId] = useState(null);
 
     async function refresh(page = 1) {
         const params = { per_page: perPage, page };
@@ -62,8 +64,19 @@ export default function Users({ initial }) {
     }
 
     async function remove(id) {
-        await axios.delete(`/admin/users/${id}/delete`, { headers: { Accept: 'application/json' } });
-        await refresh(meta.current_page ?? 1);
+        setConfirmId(id);
+        setConfirmOpen(true);
+    }
+
+    async function confirmDelete() {
+        if (!confirmId) return;
+        try {
+            await axios.delete(`/admin/users/${confirmId}/delete`, { headers: { Accept: 'application/json' } });
+        } finally {
+            setConfirmOpen(false);
+            setConfirmId(null);
+            await refresh(meta.current_page ?? 1);
+        }
     }
 
     return (
@@ -107,6 +120,20 @@ export default function Users({ initial }) {
                 </div>
             </div>
             <UserDetailsModal open={open} user={selected} onClose={() => setOpen(false)} onSave={save} form={form} setForm={setForm} />
+
+            {/* Delete Confirmation Modal */}
+            <div className={`${confirmOpen ? 'fixed' : 'hidden'} inset-0 z-50 flex items-center justify-center bg-black/50`}>
+                <div className="w-full max-w-md rounded-lg border border-neutral-800 bg-neutral-950 p-4">
+                    <div className="mb-2 text-lg font-semibold">Confirm Delete</div>
+                    <div className="text-sm text-neutral-300">
+                        Are you sure you want to delete this user? This action cannot be undone.
+                    </div>
+                    <div className="mt-4 flex items-center gap-2">
+                        <button onClick={confirmDelete} className="rounded bg-red-600 px-3 py-2 text-white">Delete</button>
+                        <button onClick={() => { setConfirmOpen(false); setConfirmId(null); }} className="rounded bg-neutral-800 px-3 py-2">Cancel</button>
+                    </div>
+                </div>
+            </div>
         </AdminLayout>
     );
 }
