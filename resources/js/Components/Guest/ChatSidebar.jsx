@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import axios from 'axios';
 
 function roleBase(role) {
@@ -142,10 +142,28 @@ export default function ChatSidebar() {
     );
   }
 
+  const unreadCount = useMemo(() => {
+    let c = 0;
+    try {
+      c += pinned.filter(p => !!p.unread).length;
+      Object.values(groups || {}).forEach(arr => {
+        (arr || []).forEach(x => { if (x.unread) c++; });
+      });
+    } catch {}
+    return c;
+  }, [pinned, groups]);
+
   return (
     <div className="ap-card p-3 max-h-[75vh] overflow-y-auto min-h-0 no-scrollbar" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
       <style>{`.no-scrollbar::-webkit-scrollbar{display:none;}`}</style>
-      <div className="mb-2 text-xs uppercase tracking-wide text-neutral-400">Start Chat</div>
+      <div className="mb-2 flex items-center justify-between">
+        <div className="text-xs uppercase tracking-wide text-neutral-400">Start Chat</div>
+        {unreadCount > 0 && (
+          <span className="text-[10px] font-semibold bg-red-600 text-white px-2 py-1 rounded">
+            {unreadCount} NEW CHAT
+          </span>
+        )}
+      </div>
       <div className="grid grid-cols-1 gap-2 items-start">
         <div className="space-y-1">
           <div className="text-xs text-neutral-400">Role</div>

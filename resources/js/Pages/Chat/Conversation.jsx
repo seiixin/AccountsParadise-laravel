@@ -21,6 +21,15 @@ function csrf() {
   return match ? decodeURIComponent(match[1]) : '';
 }
 
+function isWsConnected() {
+  try {
+    const c = window?.Echo?.connector?.pusher?.connection;
+    return !!c && c.state === 'connected';
+  } catch {
+    return false;
+  }
+}
+
 export default function Conversation({ conversationId }) {
   const { auth } = usePage().props;
   const role = auth?.user?.role;
@@ -40,6 +49,7 @@ export default function Conversation({ conversationId }) {
   const fileInputRef = useRef(null);
   const listRef = useRef(null);
   const idsRef = useRef(new Set());
+  const [unreadCount, setUnreadCount] = useState(0);
   useEffect(() => {
     const el = listRef.current;
     if (el) {
@@ -67,9 +77,8 @@ export default function Conversation({ conversationId }) {
   useEffect(() => {
     const t = setInterval(() => {
       if (!conv) return;
-      if (!window.Echo) {
-        load(meta.last_page ?? 1);
-      }
+      const connected = isWsConnected();
+      if (!connected) load(meta.last_page ?? 1);
     }, 4000);
     return () => clearInterval(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -107,6 +116,33 @@ export default function Conversation({ conversationId }) {
     participants.forEach(p => m.set(p.user_id, p));
     return m;
   }, [participants]);
+
+  async function refreshUnread() {
+    const res = await axios.get(`${base}/inbox`, { params: { page: 1, per_page: 20 }, headers: { Accept: 'application/json' } });
+    let c = 0;
+    const pinned = res.data?.pinned ?? [];
+    c += pinned.filter(p => !!p.unread).length;
+    const groups = res.data?.groups ?? {};
+    Object.values(groups).forEach(arr => {
+      (arr ?? []).forEach(x => { if (x.unread) c++; });
+    });
+    setUnreadCount(c);
+  }
+
+  useEffect(() => {
+    refreshUnread();
+    const handler = () => refreshUnread();
+    window.addEventListener('ap-inbox-refresh', handler);
+    const t = setInterval(() => refreshUnread(), 10000);
+    const onVis = () => { if (document.visibilityState === 'visible') refreshUnread(); };
+    document.addEventListener('visibilitychange', onVis);
+    return () => {
+      window.removeEventListener('ap-inbox-refresh', handler);
+      clearInterval(t);
+      document.removeEventListener('visibilitychange', onVis);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [base]);
 
   async function send() {
     if (!content.trim() && !attachment) return;
@@ -206,16 +242,46 @@ export default function Conversation({ conversationId }) {
         <div className="hidden md:block md:col-span-3 md:h-full md:overflow-y-auto no-scrollbar"><ChatSidebar /></div>
         <div className="md:col-span-6 md:ap-card md:p-3 p-0 h-full overflow-y-auto no-scrollbar flex flex-col">
           <div className="md:hidden px-2 py-2 border-b border-neutral-800 bg-neutral-950 flex items-center justify-between sticky top-0 z-10">
-            <button
-              onClick={() => setShowInbox(true)}
-              className="rounded px-2 py-1"
-              aria-label="Back to Inbox"
-              title="Inbox"
-            >
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                <path d="M15 6l-6 6 6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
+{unreadCount > 0 ? (
+  <button
+    onClick={() => setShowInbox(true)}
+    className="ml-2 inline-flex items-center gap-2 text-[10px] font-semibold bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 transition"
+    aria-label="Back to Inbox"
+    title="Back to Inbox"
+  >
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+      <path
+        d="M15 6l-6 6 6 6"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+
+    <span className="leading-none">
+      {unreadCount} NEW CHAT
+    </span>
+  </button>
+) : (
+  <button
+    onClick={() => setShowInbox(true)}
+    className="rounded p-2 hover:bg-gray-100 transition"
+    aria-label="Back to Inbox"
+    title="Inbox"
+  >
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+      <path
+        d="M15 6l-6 6 6 6"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  </button>
+)}
+
             <div className="flex items-center gap-2">
               <div className="h-8 w-8 rounded-full overflow-hidden bg-neutral-800 flex items-center justify-center">
                 {isGroup ? (
@@ -251,7 +317,7 @@ export default function Conversation({ conversationId }) {
                 )}
               </div>
               <div>
-                <div className="text-sm font-semibold">{conv?.title ?? (other?.name ?? 'Conversation')}</div>
+                <div className="text-sm font-semibold">{isGroup ? (conv?.title ?? 'Group Chat') : (other?.name ?? 'Conversation')}</div>
               </div>
             </div>
           </div>

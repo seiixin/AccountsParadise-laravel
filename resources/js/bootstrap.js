@@ -65,7 +65,18 @@ window.axios.interceptors.response.use(
   (error) => {
     const status = error?.response?.status;
     if (status === 419) {
-      window.showErrorAlert('Session expired', 'Please refresh the page and try again.');
+      const url = error?.config?.url || '';
+      let path = '';
+      try {
+        const u = new URL(url, window.location.origin);
+        path = u.pathname || '';
+      } catch {
+        path = typeof url === 'string' ? url : '';
+      }
+      const isAuth = /\/(login|logout)(\/|$)/.test(path);
+      if (isAuth) {
+        window.showErrorAlert('Session expired', 'Please refresh the page and try again.');
+      }
     }
     return Promise.reject(error);
   }
@@ -78,7 +89,18 @@ if (typeof window !== 'undefined' && typeof window.fetch === 'function') {
     const res = await originalFetch(...args);
     try {
       if (res && res.status === 419) {
-        window.showErrorAlert('Session expired', 'Please refresh the page and try again.');
+        const url = res?.url || (args?.[0] && typeof args[0] === 'string' ? args[0] : '');
+        let path = '';
+        try {
+          const u = new URL(url, window.location.origin);
+          path = u.pathname || '';
+        } catch {
+          path = typeof url === 'string' ? url : '';
+        }
+        const isAuth = /\/(login|logout)(\/|$)/.test(path);
+        if (isAuth) {
+          window.showErrorAlert('Session expired', 'Please refresh the page and try again.');
+        }
       }
     } catch {}
     return res;
