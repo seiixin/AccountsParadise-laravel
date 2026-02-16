@@ -34,9 +34,6 @@ RUN apt-get update && apt-get install -y \
 COPY --from=composer-builder /app /var/www/html
 COPY --from=node-builder /app/public/build /var/www/html/public/build
 
-# Use production environment file if present
-COPY .env.prod /var/www/html/.env
-
 # Permissions
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
  && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache

@@ -5,9 +5,10 @@ cd /var/www/html
 # Ensure storage symlink exists
 php -r "file_exists('public/storage') || symlink('storage/app/public','public/storage');"
 
-# Generate app key if not set
-php -r "file_exists('.env') && !getenv('APP_KEY') ? 0 : 0;"
-php artisan key:generate || true
+# Generate app key only if missing and .env exists
+if [ -z "$APP_KEY" ] && [ -f ".env" ]; then
+  php artisan key:generate || true
+fi
 
 # Optimize caches
 php artisan config:cache || true
