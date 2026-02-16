@@ -25,6 +25,20 @@ class PayoutRequestController extends Controller
             'approval_notes' => $request->approval_notes,
         ]);
 
+        if ($payout->status === 'approved' && !empty($payout->orders_snapshot)) {
+            $orderIds = collect($payout->orders_snapshot)
+                ->pluck('id')
+                ->filter()
+                ->map(fn ($v) => (int) $v)
+                ->all();
+
+            if (!empty($orderIds)) {
+                \App\Models\Order::query()
+                    ->whereIn('id', $orderIds)
+                    ->update(['payout_complete' => true]);
+            }
+        }
+
         return response()->json($payout);
     }
 }

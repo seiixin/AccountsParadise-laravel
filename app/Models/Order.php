@@ -21,6 +21,11 @@ class Order extends Model
         'listing_title_snapshot',
         'listing_type_snapshot',
         'game_snapshot',
+        'payout_complete',
+    ];
+
+    protected $casts = [
+        'payout_complete' => 'boolean',
     ];
 
     public function buyer()

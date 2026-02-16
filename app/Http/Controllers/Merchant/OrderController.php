@@ -23,6 +23,23 @@ class OrderController extends Controller
             $query->where('seller_id', auth()->id());
         }
 
+        if ($request->filled('q')) {
+            $q = (string) $request->input('q');
+            $query->where(function ($sub) use ($q) {
+                $sub->where('order_no', 'like', '%' . $q . '%');
+            });
+        }
+
+        if ($request->filled('status')) {
+            $status = (string) $request->input('status');
+            $query->where('status', $status);
+        }
+
+        if ($request->boolean('eligible_for_payout', false)) {
+            $query->where('status', 'completed')
+                ->where('payout_complete', false);
+        }
+
         $forceJson = $request->input('format') === 'json';
         if ($request->wantsJson() || $forceJson) {
             return response()->json($query->paginate((int) $request->input('per_page', 20)));

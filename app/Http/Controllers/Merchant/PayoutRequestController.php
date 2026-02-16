@@ -41,11 +41,12 @@ class PayoutRequestController extends Controller
                 ->where('seller_id', auth()->id())
                 ->whereIn('id', $data['order_ids'])
                 ->where('status', 'completed')
+                ->where('payout_complete', false)
                 ->select(['id', 'order_no', 'amount', 'currency', 'status', 'listing_title_snapshot', 'created_at'])
                 ->get();
 
             if ($orders->isEmpty()) {
-                return response()->json(['message' => 'No completed orders found'], 422);
+                return response()->json(['message' => 'No eligible completed orders found'], 422);
             }
 
             $currency = $orders->first()->currency;

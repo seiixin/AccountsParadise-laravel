@@ -14,14 +14,16 @@ export default function Orders({ initial }) {
     };
   });
 
-  const [all, setAll] = useState(false);
+  const [q, setQ] = useState('');
+  const [status, setStatus] = useState('');
 
   async function refresh(page = 1) {
     const res = await axios.get('/merchant/orders', {
       params: {
         page,
         per_page: 20,
-        all: all ? 1 : undefined,
+        q: q || undefined,
+        status: status || undefined,
         format: 'json',
       },
       headers: { Accept: 'application/json' },
@@ -50,23 +52,43 @@ export default function Orders({ initial }) {
 
       <div className="mx-auto max-w-6xl p-4">
 
-        {/* FILTER */}
-        <div className="mb-4 flex flex-col md:flex-row gap-3 md:items-center">
-          <label className="flex items-center gap-2 text-sm">
+        {/* FILTERS */}
+        <div className="mb-4 grid grid-cols-1 md:grid-cols-3 gap-2">
+          <div>
+            <div className="text-xs text-neutral-400 mb-1">Search</div>
             <input
-              type="checkbox"
-              checked={all}
-              onChange={(e) => setAll(e.target.checked)}
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder="Order #"
+              className="w-full rounded border border-neutral-800 bg-neutral-950 px-3 py-2"
             />
-            Show all orders
-          </label>
-
-          <button
-            onClick={() => refresh(1)}
-            className="rounded border border-neutral-700 px-4 py-2 w-full md:w-auto"
-          >
-            Apply
-          </button>
+          </div>
+          <div>
+            <div className="text-xs text-neutral-400 mb-1">Status</div>
+            <select
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+              className="w-full rounded border border-neutral-800 bg-neutral-950 px-3 py-2"
+            >
+              <option value="">All</option>
+              <option value="pending">pending</option>
+              <option value="paid">paid</option>
+              <option value="processing">processing</option>
+              <option value="delivered">delivered</option>
+              <option value="completed">completed</option>
+              <option value="cancelled">cancelled</option>
+              <option value="disputed">disputed</option>
+              <option value="refunded">refunded</option>
+            </select>
+          </div>
+          <div className="flex items-end">
+            <button
+              onClick={() => refresh(1)}
+              className="w-full rounded bg-neutral-800 px-3 py-2"
+            >
+              Filter
+            </button>
+          </div>
         </div>
 
         {/* ============================= */}

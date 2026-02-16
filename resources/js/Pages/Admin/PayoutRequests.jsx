@@ -4,7 +4,14 @@ import axios from 'axios';
 
 export default function PayoutRequests({ initial }) {
     const [data, setData] = useState(initial?.data ?? []);
-    const [meta, setMeta] = useState(initial?.meta ?? {});
+    const [meta, setMeta] = useState(() => {
+        const payload = initial ?? {};
+        return payload.meta ?? {
+            current_page: payload.current_page ?? 1,
+            last_page: payload.last_page ?? 1,
+            links: payload.links ?? [],
+        };
+    });
     const [status, setStatus] = useState('');
     const perPage = 20;
     const [open, setOpen] = useState(false);
@@ -23,8 +30,13 @@ export default function PayoutRequests({ initial }) {
         const params = { per_page: perPage, page };
         if (status) params.status = status;
         const res = await axios.get('/admin/payout-requests', { params, headers: { Accept: 'application/json' } });
-        setData(res.data.data);
-        setMeta(res.data.meta);
+        const payload = res.data ?? {};
+        setData(payload.data ?? []);
+        setMeta(payload.meta ?? {
+            current_page: payload.current_page ?? 1,
+            last_page: payload.last_page ?? 1,
+            links: payload.links ?? [],
+        });
     }
 
     function openModal(item) {

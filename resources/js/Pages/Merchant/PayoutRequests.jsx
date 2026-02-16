@@ -55,12 +55,12 @@ export default function PayoutRequests({ initial }) {
     setSelectOpen(true);
 
     const res = await axios.get('/merchant/orders', {
-      params: { per_page: 100, format: 'json' },
+      params: { per_page: 100, format: 'json', eligible_for_payout: 1 },
       headers: { Accept: 'application/json' },
       withCredentials: true,
     });
 
-    const list = (res.data?.data ?? []).filter(o => o.status === 'completed');
+    const list = (res.data?.data ?? []);
     setOrders(list);
   }
 

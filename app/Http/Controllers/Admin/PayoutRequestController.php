@@ -81,6 +81,20 @@ public function approve(ApprovePayoutRequest $request, int $id): JsonResponse
 
         $payout->save();
 
+        if ($payout->status === 'approved' && !empty($payout->orders_snapshot)) {
+            $orderIds = collect($payout->orders_snapshot)
+                ->pluck('id')
+                ->filter()
+                ->map(fn ($v) => (int) $v)
+                ->all();
+
+            if (!empty($orderIds)) {
+                \App\Models\Order::query()
+                    ->whereIn('id', $orderIds)
+                    ->update(['payout_complete' => true]);
+            }
+        }
+
         // ⛔ DO NOT pass columns to fresh()
         return $payout->refresh();
     });
