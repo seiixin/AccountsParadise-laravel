@@ -3,8 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 export default function HeroSlider({ items = [] }) {
   const slides = useMemo(() => {
     const f = (items || []).filter(i => i?.is_featured);
-    const base = f.length ? f : (items || []);
-    return base.slice(0, 5);
+    return f.slice(0, 5);
   }, [items]);
   const [index, setIndex] = useState(0);
 

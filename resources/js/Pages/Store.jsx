@@ -98,15 +98,11 @@ export default function Store({ initial, categories, selectedType = '' }) {
   }, []);
 
   useEffect(() => {
-    if (initial?.data?.length) {
-      setHeroItems(initial.data);
-    } else {
-      axios.get('/store', { params: { per_page: 12 }, headers: { Accept: 'application/json' } })
-        .then(res => {
-          const payload = res.data.listings ?? res.data;
-          setHeroItems(payload.data ?? []);
-        });
-    }
+    axios.get('/store', { params: { per_page: 12 }, headers: { Accept: 'application/json' } })
+      .then(res => {
+        const payload = res.data.listings ?? res.data;
+        setHeroItems(payload.data ?? []);
+      });
   }, []);
 
   useEffect(() => {

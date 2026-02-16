@@ -11,6 +11,18 @@ export default function Navbar() {
   const dropdownRef = useRef(null);
   const userBtnRef = useRef(null);
   const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0 });
+  const inboxHref = !user
+    ? route('login')
+    : role === 'buyer'
+      ? route('buyer.chat.inbox')
+      : role === 'merchant'
+        ? route('merchant.chat.inbox')
+        : role === 'admin'
+          ? route('admin.chat.inbox')
+          : role === 'midman'
+            ? route('midman.chat.inbox')
+            : route('buyer.chat.inbox');
+  const inboxActive = (typeof window !== 'undefined' ? window.location.pathname : '').includes('/inbox');
 
   useEffect(() => {
     const onDocClick = (e) => {
@@ -52,7 +64,7 @@ export default function Navbar() {
     <nav className="glass sticky top-0 z-[2000]">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
         <div className="flex items-center gap-3 md:gap-6">
-          <Link href="/" className="flex items-center gap-2">
+          <Link href="/" className="hidden md:flex items-center gap-2">
             <img src="/AccountsParadiseLogo.png" alt="AccountsParadise" className="h-10 w-10 md:h-12 md:w-12 rounded" />
             <span className="text-lg font-semibold hidden md:inline">AccountsParadise</span>
           </Link>
@@ -61,6 +73,7 @@ export default function Navbar() {
             <Link href="/store" className={`${(typeof window !== 'undefined' ? window.location.pathname : '')?.startsWith('/store') ? 'text-cyan-300 border-b-2 border-cyan-400 pb-1' : 'text-neutral-300 hover:text-white'}`}>Store</Link>
             <Link href="/games" className={`${(typeof window !== 'undefined' ? window.location.pathname : '')?.startsWith('/games') ? 'text-cyan-300 border-b-2 border-cyan-400 pb-1' : 'text-neutral-300 hover:text-white'}`}>Games</Link>
             <Link href="/contact" className={`${(typeof window !== 'undefined' ? window.location.pathname : '')?.startsWith('/contact') ? 'text-cyan-300 border-b-2 border-cyan-400 pb-1' : 'text-neutral-300 hover:text-white'}`}>Contact</Link>
+            <Link href={inboxHref} className={`${inboxActive ? 'text-cyan-300 border-b-2 border-cyan-400 pb-1' : 'text-neutral-300 hover:text-white'}`}>Inbox</Link>
           </div>
         </div>
         <div className="flex items-center gap-3">
@@ -76,8 +89,34 @@ export default function Navbar() {
           )}
           {user && (
             <div className="relative">
-              <button ref={userBtnRef} className="rounded px-3 py-2 text-sm glass-soft text-white" onClick={() => setUserOpen((v) => !v)} aria-expanded={userOpen}>
-                {user.name}
+              <button
+                ref={userBtnRef}
+                className="rounded px-3 py-2 glass-soft text-white"
+                onClick={() => setUserOpen((v) => !v)}
+                aria-expanded={userOpen}
+              >
+                <div className="flex items-center gap-2">
+                  <div className="h-6 w-6 rounded-full bg-neutral-800 overflow-hidden flex items-center justify-center text-xs font-semibold select-none">
+                    {user?.avatar_path ? (
+                      <img
+                        src={`/storage/${user.avatar_path}`}
+                        alt={user?.name || 'avatar'}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      (user?.name || 'U').slice(0, 1)
+                    )}
+                  </div>
+                  <div className="flex flex-col items-start leading-tight">
+                    <div className="flex items-center gap-1">
+                      <span className="text-sm font-medium">{user?.name}</span>
+                      <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+                        <path d="M6 9l6 6 6-6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </div>
+                    <span className="text-[11px] text-neutral-300">{user?.email}</span>
+                  </div>
+                </div>
               </button>
               {createPortal(
                 <div
@@ -128,10 +167,15 @@ export default function Navbar() {
       <div className={`${open ? 'block' : 'hidden'} md:hidden border-t border-neutral-800`}>
         <div className="mx-auto max-w-7xl px-4 py-3 text-sm">
           <div className="flex flex-col gap-2">
+            <div className="flex flex-col items-center justify-center py-2">
+              <img src="/AccountsParadiseLogo.png" alt="AccountsParadise" className="h-12 w-12 rounded" />
+              <div className="mt-1 text-base font-semibold">AccountsParadise</div>
+            </div>
             <Link href="/" className="rounded px-3 py-2 glass-soft">Home</Link>
             <Link href="/store" className="rounded px-3 py-2 glass-soft">Store</Link>
             <Link href="/games" className="rounded px-3 py-2 glass-soft">Games</Link>
             <Link href="/contact" className="rounded px-3 py-2 glass-soft">Contact</Link>
+            <Link href={inboxHref} className="rounded px-3 py-2 glass-soft">Inbox</Link>
             {!user ? (
               <>
                 <Link href={route('login')} className="rounded px-3 py-2 text-black btn-primary-sleek">Login</Link>

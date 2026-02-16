@@ -27,7 +27,7 @@ export default function AdminLayout({ title, header, children }) {
       <Head title={title ?? 'Admin'} />
 
       {/* Navbar */}
-      <div className="glass">
+      <div className="glass sticky top-0 z-[2000]">
         <Navbar />
       </div>
 

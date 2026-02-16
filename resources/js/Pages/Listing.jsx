@@ -13,6 +13,7 @@ export default function Listing({ listing, images = [] }) {
   const [open, setOpen] = useState(false);
   const [idImage, setIdImage] = useState(null);
   const [receiptImage, setReceiptImage] = useState(null);
+  const [faceImage, setFaceImage] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState('GCash');
   const [paymentRef, setPaymentRef] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -21,6 +22,7 @@ export default function Listing({ listing, images = [] }) {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [errors, setErrors] = useState({});
   const [cameraOpen, setCameraOpen] = useState(false);
+  const [faceCamOpen, setFaceCamOpen] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -44,6 +46,7 @@ export default function Listing({ listing, images = [] }) {
     fd.append('payment_reference', paymentRef);
     if (idImage) fd.append('id_image', idImage);
     if (receiptImage) fd.append('receipt_image', receiptImage);
+    if (faceImage) fd.append('face_image', faceImage);
     try {
       await axios.post(route('buyer.purchase.store'), fd, {
         headers: { 'Content-Type': 'multipart/form-data' },
@@ -170,6 +173,18 @@ export default function Listing({ listing, images = [] }) {
                 <div className="mt-3">
                   <div className="text-white">Price</div>
                   <div className="text-xl font-semibold text-white">{listing.currency} {listing.price}</div>
+                  <div className="mt-2 text-sm text-neutral-300">Midman Fee: ₱{(() => {
+                    const amt = Number(listing.price) || 0;
+                    if (amt >= 100 && amt <= 999) return 20;
+                    if (amt >= 1000 && amt <= 4999) return Math.round(amt * 0.05);
+                    if (amt >= 5000 && amt <= 9999) return Math.round(amt * 0.04);
+                    if (amt >= 10000) return Math.round(amt * 0.03);
+                    return 0;
+                  })()} · Total: ₱{(() => {
+                    const amt = Number(listing.price) || 0;
+                    const fee = (amt >= 100 && amt <= 999) ? 20 : (amt >= 1000 && amt <= 4999) ? Math.round(amt * 0.05) : (amt >= 5000 && amt <= 9999) ? Math.round(amt * 0.04) : (amt >= 10000) ? Math.round(amt * 0.03) : 0;
+                    return amt + fee;
+                  })()}</div>
                 </div>
               </div>
               <div className="ap-card p-4">
@@ -187,13 +202,22 @@ export default function Listing({ listing, images = [] }) {
                   <div className="text-sm text-white mb-1">Payment</div>
                   <select value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)} className="ap-input w-full px-3 py-2">
                     <option>GCash</option>
+                    <option>InstaPay</option>
                     <option>Bank Transfer</option>
                   </select>
                   <input value={paymentRef} onChange={(e) => setPaymentRef(e.target.value)} placeholder="Reference / Transaction ID" className="ap-input w-full px-3 py-2 mt-2" />
                 {errors?.payment_reference && <div className="mt-1 text-xs text-red-400">{[].concat(errors.payment_reference).join(', ')}</div>}
                   <div className="mt-2">
+                    <div className="text-sm text-white mb-1">Receipt</div>
                     <input type="file" accept="image/*" onChange={(e) => setReceiptImage(e.target.files?.[0] ?? null)} className="ap-input w-full px-3 py-2" />
                   {errors?.receipt_image && <div className="mt-1 text-xs text-red-400">{[].concat(errors.receipt_image).join(', ')}</div>}
+                  </div>
+                  <div className="mt-3">
+                    <div className="text-sm text-white mb-1">Face</div>
+                    <div className="flex items-center gap-2">
+                      <button className="rounded border border-neutral-700 px-3 py-2" onClick={() => setFaceCamOpen(true)}>Use Camera</button>
+                      {faceImage && <div className="text-xs text-white">Ready</div>}
+                    </div>
                   </div>
                 </div>
                 <div className="mt-6 flex items-center gap-3">
@@ -207,7 +231,8 @@ export default function Listing({ listing, images = [] }) {
           </div>
         </div>
       )}
-      <IdCapture open={cameraOpen} onClose={() => setCameraOpen(false)} onCapture={(file) => setIdImage(file)} />
+      <IdCapture open={cameraOpen} onClose={() => setCameraOpen(false)} onCapture={(file) => setIdImage(file)} facingMode="environment" />
+      <IdCapture open={faceCamOpen} onClose={() => setFaceCamOpen(false)} onCapture={(file) => setFaceImage(file)} facingMode="user" />
     </PublicLayout>
   );
 }

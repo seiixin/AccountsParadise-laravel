@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
-export default function IdCapture({ open, onClose, onCapture }) {
+export default function IdCapture({ open, onClose, onCapture, facingMode = 'environment' }) {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const streamRef = useRef(null);
@@ -10,7 +10,7 @@ export default function IdCapture({ open, onClose, onCapture }) {
   useEffect(() => {
     const start = async () => {
       try {
-        const s = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+        const s = await navigator.mediaDevices.getUserMedia({ video: { facingMode } });
         streamRef.current = s;
         if (videoRef.current) {
           videoRef.current.srcObject = s;

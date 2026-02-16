@@ -26,7 +26,7 @@ export default function BuyerLayout({ title = 'Buyer', header, children }) {
     <>
     <div className="min-h-screen bg-gradient-app text-neutral-100">
       <Head title={title} />
-      <div className="glass">
+      <div className="glass sticky top-0 z-[2000]">
         <Navbar />
       </div>
       <div className="mx-auto max-w-7xl p-4 md:p-6">

@@ -14,7 +14,7 @@ export default function PublicLayout({ children, header, fullWidth = false }) {
     : '/login';
   return (
     <div className="min-h-screen bg-gradient-app text-neutral-100">
-      <div className="glass">
+      <div className="glass sticky top-0 z-[2000]">
         <Navbar />
       </div>
       <div className={fullWidth ? 'w-full px-0 md:px-0 lg:px-[5px]' : 'mx-auto max-w-7xl p-6'}>

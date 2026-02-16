@@ -30,7 +30,7 @@ export default function MerchantLayout({ title = 'Merchant', header, children })
       <Head title={title} />
 
       {/* Same Navbar wrapper as Buyer */}
-      <div className="glass">
+      <div className="glass sticky top-0 z-[2000]">
         <Navbar />
       </div>
 

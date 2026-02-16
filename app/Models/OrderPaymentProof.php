@@ -14,6 +14,7 @@ class OrderPaymentProof extends Model
         'payment_reference',
         'id_image_path',
         'receipt_image_path',
+        'face_image_path',
         'status',
         'reviewed_by_id',
         'reviewed_at',
@@ -22,11 +23,16 @@ class OrderPaymentProof extends Model
         'idscan_provider',
         'idscan_result',
         'idscan_request_id',
+        'facescan_status',
+        'facescan_provider',
+        'facescan_result',
+        'facescan_request_id',
     ];
 
     protected $casts = [
         'reviewed_at' => 'datetime',
         'idscan_result' => 'array',
+        'facescan_result' => 'array',
     ];
 
     public function order()
