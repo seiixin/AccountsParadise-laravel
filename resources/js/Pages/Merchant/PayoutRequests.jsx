@@ -1,6 +1,7 @@
 import MerchantLayout from '@/Layouts/MerchantLayout';
 import { Head } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import axios from 'axios';
 
 export default function PayoutRequests({ initial }) {
@@ -27,6 +28,19 @@ export default function PayoutRequests({ initial }) {
   useEffect(() => {
     if (!initial?.data?.length) refresh(1);
   }, []);
+
+  useEffect(() => {
+    const b = document.body;
+    const prev = b.style.overflow;
+    if (selectOpen || viewOpen) {
+      b.style.overflow = 'hidden';
+    } else {
+      b.style.overflow = prev || '';
+    }
+    return () => {
+      b.style.overflow = '';
+    };
+  }, [selectOpen, viewOpen]);
 
   async function refresh(page = 1) {
     const res = await axios.get('/merchant/payout-requests', {
@@ -231,75 +245,37 @@ export default function PayoutRequests({ initial }) {
       </div>
 
       {/* SELECT MODAL (Bottom Sheet on Mobile) */}
-      {selectOpen && (
-        <div className="fixed inset-0 z-50 bg-black/50 flex items-end sm:items-center justify-center">
-          <div className="w-full sm:max-w-3xl bg-neutral-950 rounded-t-xl sm:rounded-xl p-4 max-h-[85vh] overflow-y-auto">
-            <div className="text-lg font-semibold mb-4">
-              Select Completed Orders
-            </div>
-
-            <div className="text-sm mb-3">
-              Total: {currency} {totalSelected}
-            </div>
-
+      {selectOpen && createPortal(
+        <div className="fixed inset-0 z-[2147483647] bg-black/60 backdrop-blur-sm flex items-center justify-center">
+          <div className="w-full sm:max-w-3xl bg-neutral-950 rounded-xl p-4 max-h-[85vh] overflow-y-auto text-white">
+            <div className="text-lg font-semibold mb-4">Select Completed Orders</div>
+            <div className="text-sm mb-3">Total: {currency} {totalSelected}</div>
             <div className="space-y-3">
               {orders.map(o => (
-                <div
-                  key={o.id}
-                  className="border border-neutral-800 rounded-lg p-3 flex justify-between items-center"
-                >
+                <div key={o.id} className="border border-neutral-800 rounded-lg p-3 flex justify-between items-center">
                   <div>
-                    <div className="font-medium">
-                      #{o.order_no ?? o.id}
-                    </div>
-                    <div className="text-sm text-neutral-400">
-                      {o.amount} {o.currency}
-                    </div>
+                    <div className="font-medium">#{o.order_no ?? o.id}</div>
+                    <div className="text-sm text-neutral-400">{o.amount} {o.currency}</div>
                   </div>
-
-                  <input
-                    type="checkbox"
-                    checked={selectedIds.includes(o.id)}
-                    onChange={() => toggleId(o.id)}
-                  />
+                  <input type="checkbox" checked={selectedIds.includes(o.id)} onChange={() => toggleId(o.id)} />
                 </div>
               ))}
-
-              {!orders.length && (
-                <div className="text-neutral-400 text-center py-4">
-                  No completed orders
-                </div>
-              )}
+              {!orders.length && (<div className="text-neutral-400 text-center py-4">No completed orders</div>)}
             </div>
-
             <div className="mt-4 flex flex-col sm:flex-row gap-3">
-              <button
-                onClick={submitSelected}
-                disabled={!selectedIds.length}
-                className="w-full rounded bg-blue-600 px-4 py-3 text-white disabled:opacity-50"
-              >
-                Submit Request
-              </button>
-
-              <button
-                onClick={() => setSelectOpen(false)}
-                className="w-full rounded bg-neutral-800 px-4 py-3"
-              >
-                Close
-              </button>
+              <button onClick={submitSelected} disabled={!selectedIds.length} className="w-full rounded bg-blue-600 px-4 py-3 text-white disabled:opacity-50">Submit Request</button>
+              <button onClick={() => setSelectOpen(false)} className="w-full rounded bg-neutral-800 px-4 py-3">Close</button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* VIEW MODAL */}
-      {viewOpen && (
-        <div className="fixed inset-0 z-50 bg-black/50 flex items-end sm:items-center justify-center">
-          <div className="w-full sm:max-w-3xl bg-neutral-950 rounded-t-xl sm:rounded-xl p-4 max-h-[85vh] overflow-y-auto">
-            <div className="text-lg font-semibold mb-4">
-              Orders in Payout #{viewId}
-            </div>
-
+      {viewOpen && createPortal(
+        <div className="fixed inset-0 z-[2147483647] bg-black/60 backdrop-blur-sm flex items-center justify-center">
+          <div className="w-full sm:max-w-3xl bg-neutral-950 rounded-xl p-4 max-h-[85vh] overflow-y-auto text-white">
+            <div className="text-lg font-semibold mb-4">Orders in Payout #{viewId}</div>
             <div className="space-y-3">
               {viewOrders.map(o => (
                 <div key={o.id} className="border border-neutral-800 rounded-lg p-3 space-y-1">
@@ -309,22 +285,12 @@ export default function PayoutRequests({ initial }) {
                   <Row label="Created" value={o.created_at} />
                 </div>
               ))}
-
-              {!viewOrders.length && (
-                <div className="text-neutral-400 text-center py-4">
-                  No orders attached
-                </div>
-              )}
+              {!viewOrders.length && (<div className="text-neutral-400 text-center py-4">No orders attached</div>)}
             </div>
-
-            <button
-              onClick={() => setViewOpen(false)}
-              className="mt-4 w-full rounded bg-neutral-800 px-4 py-3"
-            >
-              Close
-            </button>
+            <button onClick={() => setViewOpen(false)} className="mt-4 w-full rounded bg-neutral-800 px-4 py-3">Close</button>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </MerchantLayout>
   );

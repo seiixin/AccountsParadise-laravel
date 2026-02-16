@@ -45,8 +45,8 @@ export default function Navbar() {
   useEffect(() => {
     if (userOpen && userBtnRef.current) {
       const rect = userBtnRef.current.getBoundingClientRect();
-      const top = rect.bottom + window.scrollY + 8;
-      const left = rect.right + window.scrollX - 176;
+      const top = rect.bottom + 8;
+      const left = rect.right - 176;
       setDropdownPos({ top, left });
     }
   }, [userOpen]);

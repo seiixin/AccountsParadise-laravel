@@ -163,7 +163,7 @@ export default function Listing({ listing, images = [] }) {
       }
       {open && (
         <div className="fixed inset-0 z-[100000] flex items-center justify-center bg-black/50">
-          <div className="w-full max-w-4xl rounded-2xl glass-soft p-6">
+          <div className="w-full max-w-4xl rounded-2xl glass-soft p-6 max-h-[85vh] overflow-y-auto">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div className="ap-card p-4">
                 <div className="text-sm uppercase tracking-wide text-white">Offer</div>

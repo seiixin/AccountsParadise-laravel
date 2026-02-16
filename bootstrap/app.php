@@ -4,6 +4,8 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use App\Http\Middleware\RoleMiddleware;
+use Illuminate\Session\TokenMismatchException;
+use Inertia\Inertia;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -40,6 +42,14 @@ return Application::configure(basePath: dirname(__DIR__))
 
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->render(function (TokenMismatchException $e, $request) {
+            if ($request->wantsJson()) {
+                return response()->json(['message' => 'session_expired'], 401);
+            }
+            if ($request->header('X-Inertia')) {
+                return Inertia::location(route('login'));
+            }
+            return redirect()->route('login')->with('status', 'session-expired');
+        });
     })
     ->create();

@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\DB;
 use App\Mail\LoginAlert;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -40,7 +41,16 @@ class AuthenticatedSessionController extends Controller
         $ip = $request->ip() ?? 'Unknown';
         $agent = $request->header('User-Agent') ?? 'Unknown';
         $time = now()->toDateTimeString();
-        Mail::to(Auth::user()->email)->send(new LoginAlert($ip, $agent, $time));
+        $currentSessionId = $request->session()->getId();
+        $last = DB::table(config('session.table', 'sessions'))
+            ->where('user_id', Auth::id())
+            ->when($currentSessionId, fn($q) => $q->where('id', '!=', $currentSessionId))
+            ->orderByDesc('last_activity')
+            ->first();
+        $lastIp = $last->ip_address ?? null;
+        if ($lastIp && $lastIp !== $ip) {
+            Mail::to(Auth::user()->email)->send(new LoginAlert($ip, $agent, $time));
+        }
 
         $role = Auth::user()->role;
 

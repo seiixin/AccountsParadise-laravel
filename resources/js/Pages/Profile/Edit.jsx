@@ -99,7 +99,7 @@ export default function Edit() {
     <Layout {...layoutProps}>
       {Layout === GuestLayout ? <Head title="Profile" /> : null}
 
-      <div className="mx-auto max-w-5xl px-4 py-6 space-y-6">
+      <div className="mx-auto max-w-5xl px-0 sm:px-4 py-6 space-y-6">
 
         {/* ACCOUNT SECTION */}
         <div className="rounded-lg border border-neutral-800 bg-neutral-950 p-4 space-y-6">
