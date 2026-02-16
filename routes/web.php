@@ -13,7 +13,7 @@ use App\Http\Controllers\PublicSite\ListingController;
 Route::get('/', fn () => Inertia::render('Home'))->name('home');
 Route::get('/store', [StoreController::class, 'index'])->name('store.index');
 Route::get('/games', [GamesController::class, 'index'])->name('games.index');
-Route::get('/home', fn () => Inertia::render('Home'))->name('home');
+Route::get('/home', fn () => Inertia::render('Home'))->name('home.page');
 Route::get('/contact', fn () => Inertia::render('Contact'))->name('contact');
 Route::post('/contact/send', [ContactController::class, 'send'])->name('contact.send');
 Route::get('/listings/{id}', [ListingController::class, 'show'])->whereNumber('id')->name('listings.show');

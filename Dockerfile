@@ -18,10 +18,12 @@ RUN composer install --no-dev --prefer-dist --optimize-autoloader --no-interacti
 FROM php:8.2-apache
 WORKDIR /var/www/html
 
-# Enable Apache rewrites and set DocumentRoot to public
+# Enable Apache rewrites and set DocumentRoot to public (idempotent)
 RUN a2enmod rewrite \
- && sed -ri -e 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-available/000-default.conf \
- && sed -ri -e 's!DocumentRoot /var/www/html!DocumentRoot /var/www/html/public!g' /etc/apache2/sites-available/000-default.conf
+ && sed -ri 's#DocumentRoot /var/www/html#DocumentRoot /var/www/html/public#' /etc/apache2/sites-available/000-default.conf \
+ && printf "<Directory /var/www/html/public>\n\tAllowOverride All\n</Directory>\n" > /etc/apache2/conf-available/laravel-public.conf \
+ && a2enconf laravel-public \
+ && sed -ri "s#Listen 80#Listen ${PORT:-10000}#" /etc/apache2/ports.conf
 
 # Install PHP extensions commonly needed by Laravel
 RUN apt-get update && apt-get install -y \
@@ -42,6 +44,6 @@ RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cac
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
-EXPOSE 80
+EXPOSE 10000
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 CMD ["apache2-foreground"]
