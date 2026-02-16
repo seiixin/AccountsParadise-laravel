@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { usePage } from '@inertiajs/react';
 import axios from 'axios';
 import ZoomViewer from '@/Components/zoomreference';
+import { normalizeMediaUrl } from '@/Components/zoomreference';
 import { createPortal } from 'react-dom';
 
 export default function Orders({ initial }) {
@@ -15,6 +16,7 @@ export default function Orders({ initial }) {
     const [newStatus, setNewStatus] = useState('');
     const role = usePage().props?.auth?.user?.role ?? 'admin';
     const [preview, setPreview] = useState(null);
+    const [natural, setNatural] = useState({ w: 0, h: 0 });
     const [wide, setWide] = useState(
         typeof window !== 'undefined' ? window.innerWidth >= 1024 : false
     );
@@ -30,6 +32,16 @@ export default function Orders({ initial }) {
         return () => window.removeEventListener('resize', onResize);
     }, []);
 
+    useEffect(() => {
+        if (Array.isArray(preview) && preview[0]?.src) {
+            const url = normalizeMediaUrl(preview[0].src);
+            const img = new Image();
+            img.onload = () => setNatural({ w: img.naturalWidth || 0, h: img.naturalHeight || 0 });
+            img.src = url;
+        } else {
+            setNatural({ w: 0, h: 0 });
+        }
+    }, [preview]);
     async function refresh(page = 1) {
         const params = { per_page: perPage, page };
         if (status) params.status = status;
@@ -346,34 +358,30 @@ export default function Orders({ initial }) {
             )}
 
             {Array.isArray(preview) && preview.length > 0 && createPortal(
-                <div className="fixed inset-0 z-[2147483646] flex items-center justify-center bg-black/70 p-4">
-                    <div className="w-full max-w-[1200px] rounded-lg border border-neutral-800 bg-neutral-950 p-4">
-                        <div className="mb-3 text-lg font-semibold">Proof Preview</div>
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                            <div className="w-full">
-                                <ZoomViewer
-                                    media={preview}
-                                    showThumbs={false}
-                                    zoomPortalId={wide ? 'admin-zoom-portal' : null}
-                                    zoomWidth={640}
-                                    zoomHeight={640}
-                                    disableZoom={!wide}
-                                />
-                            </div>
-                            <div className="relative hidden lg:block min-h-[640px]">
-                                <div id="admin-zoom-portal" className="absolute inset-0" />
-                            </div>
-                        </div>
-                        <div className="mt-4 flex justify-end">
+                (() => {
+                    const src = normalizeMediaUrl(preview[0]?.src || '');
+                    const vw = typeof window !== 'undefined' ? window.innerWidth : 1200;
+                    const vh = typeof window !== 'undefined' ? window.innerHeight : 800;
+                    const r = natural.w && natural.h ? natural.w / natural.h : (4 / 3);
+                    const candidateW = Math.min(vw, Math.floor(vh * r));
+                    const candidateH = Math.floor(candidateW / r);
+                    return (
+                        <div className="fixed inset-0 z-[2147483646] bg-black/85">
+                            <img
+                                src={src}
+                                alt="Proof"
+                                style={{ width: `${candidateW}px`, height: `${candidateH}px` }}
+                                className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 object-contain"
+                            />
                             <button
                                 onClick={() => setPreview(null)}
-                                className="rounded bg-neutral-800 px-4 py-2"
+                                className="fixed top-4 right-4 rounded bg-white px-4 py-2 text-black"
                             >
                                 Close
                             </button>
                         </div>
-                    </div>
-                </div>,
+                    );
+                })(),
                 document.body
             )}
 
