@@ -133,9 +133,32 @@ export default function Listing({ listing, images = [] }) {
                     return;
                   }
                   try {
-                    const res = await axios.post(route('buyer.chat.start'), { seller_id: listing.merchant_id }, { headers: { Accept: 'application/json' }, withCredentials: true });
-                    const cid = res?.data?.conversation_id;
-                    if (cid) window.location.href = `/buyer/chat/${cid}`;
+                    const role = String(user.role || '').toLowerCase();
+                    if (role === 'buyer') {
+                      const res = await axios.post(route('buyer.chat.start'), { seller_id: listing.merchant_id }, { headers: { Accept: 'application/json' }, withCredentials: true });
+                      const cid = res?.data?.conversation_id;
+                      if (cid) window.location.href = `/buyer/chat/${cid}`;
+                      return;
+                    }
+                    const payload = { target_user_id: listing.merchant_id };
+                    if (role === 'merchant') {
+                      const res = await axios.post(route('merchant.chat.start-with'), payload, { headers: { Accept: 'application/json' }, withCredentials: true });
+                      const cid = res?.data?.conversation_id;
+                      if (cid) window.location.href = `/merchant/chat/${cid}`;
+                      return;
+                    }
+                    if (role === 'admin') {
+                      const res = await axios.post(route('admin.chat.start-with'), payload, { headers: { Accept: 'application/json' }, withCredentials: true });
+                      const cid = res?.data?.conversation_id;
+                      if (cid) window.location.href = `/admin/chat/${cid}`;
+                      return;
+                    }
+                    if (role === 'midman') {
+                      const res = await axios.post(route('midman.chat.start-with'), payload, { headers: { Accept: 'application/json' }, withCredentials: true });
+                      const cid = res?.data?.conversation_id;
+                      if (cid) window.location.href = `/midman/chat/${cid}`;
+                      return;
+                    }
                   } catch {}
                 }}
               >

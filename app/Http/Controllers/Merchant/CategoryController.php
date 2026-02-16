@@ -14,8 +14,15 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        return Category::select('id', 'name')
-            ->where('status', 'approved')
+        return Category::select('id', 'name', 'status')
+            ->where(function ($q) {
+                $q->where('status', 'approved')
+                  ->orWhere(function ($qq) {
+                      $qq->where('status', 'pending')
+                         ->where('created_by_id', Auth::id());
+                  });
+            })
+            ->orderBy('name')
             ->get();
     }
 

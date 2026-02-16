@@ -32,6 +32,9 @@ function AddModal({ open, onClose, onCreated }) {
   const [images, setImages] = useState([]);
   const [categories, setCategories] = useState([]);
   const [saving, setSaving] = useState(false);
+  const [addingCat, setAddingCat] = useState(false);
+  const [newCat, setNewCat] = useState('');
+  const [catSaving, setCatSaving] = useState(false);
 
   useEffect(() => {
     if (open) {
@@ -40,6 +43,24 @@ function AddModal({ open, onClose, onCreated }) {
         .catch(() => setCategories([]));
     }
   }, [open]);
+
+  async function createCategory() {
+    if (!newCat.trim().length) return;
+    setCatSaving(true);
+    try {
+      const res = await axios.post('/merchant/categories/create', { name: newCat.trim() }, {
+        headers: { Accept: 'application/json' },
+        withCredentials: true,
+      });
+      const created = res.data;
+      setCategories(prev => [{ id: created.id, name: created.name, status: created.status }, ...prev]);
+      setCategoryId(String(created.id));
+      setNewCat('');
+      setAddingCat(false);
+    } finally {
+      setCatSaving(false);
+    }
+  }
 
   async function save() {
     setSaving(true);
@@ -88,10 +109,34 @@ function AddModal({ open, onClose, onCreated }) {
               <option value="topup">Top-Up</option>
             </select>
           </div>
+        <div className="space-y-2">
           <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)} className="rounded border border-neutral-800 bg-neutral-950 px-3 py-2 w-full">
             <option value="">Select category</option>
             {categories.map(c => (<option key={c.id} value={c.id}>{c.name}</option>))}
           </select>
+          {!addingCat && (
+          <button
+            type="button"
+            onClick={() => setAddingCat(true)}
+            className="px-4 py-2 text-sm font-medium text-white bg-amber-600 rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Add New Category
+          </button>
+
+
+          )}
+          {addingCat && (
+            <div className="flex gap-2">
+              <input value={newCat} onChange={(e) => setNewCat(e.target.value)} placeholder="Category name" className="rounded border border-neutral-800 bg-neutral-950 px-3 py-2 w-full" />
+              <button type="button" onClick={createCategory} disabled={catSaving || !newCat.trim().length} className="rounded bg-white px-3 py-2 text-black">
+                {catSaving ? 'Saving...' : 'Save'}
+              </button>
+              <button type="button" onClick={() => { setAddingCat(false); setNewCat(''); }} className="rounded border border-neutral-700 px-3 py-2">
+                Cancel
+              </button>
+            </div>
+          )}
+        </div>
           <input value={price} onChange={(e) => setPrice(e.target.value)} placeholder="₱0.00" className="rounded border border-neutral-800 bg-neutral-950 px-3 py-2 w-full" />
           <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Delivery method, requirements, timeframe..." className="sm:col-span-2 rounded border border-neutral-800 bg-neutral-950 px-3 py-2" />
           <div className="sm:col-span-2">
@@ -125,6 +170,9 @@ function EditModal({ open, onClose, listingId, onUpdated }) {
   const [images, setImages] = useState([]);
   const [gallery, setGallery] = useState([]);
   const [saving, setSaving] = useState(false);
+  const [addingCat, setAddingCat] = useState(false);
+  const [newCat, setNewCat] = useState('');
+  const [catSaving, setCatSaving] = useState(false);
 
   useEffect(() => {
     if (open && listingId) {
@@ -150,6 +198,24 @@ function EditModal({ open, onClose, listingId, onUpdated }) {
         .then(res => setCategories(res.data ?? []));
     }
   }, [open, listingId]);
+
+  async function createCategory() {
+    if (!newCat.trim().length) return;
+    setCatSaving(true);
+    try {
+      const res = await axios.post('/merchant/categories/create', { name: newCat.trim() }, {
+        headers: { Accept: 'application/json' },
+        withCredentials: true,
+      });
+      const created = res.data;
+      setCategories(prev => [{ id: created.id, name: created.name, status: created.status }, ...prev]);
+      setCategoryId(String(created.id));
+      setNewCat('');
+      setAddingCat(false);
+    } finally {
+      setCatSaving(false);
+    }
+  }
 
   async function update() {
     setSaving(true);
@@ -256,6 +322,27 @@ function EditModal({ open, onClose, listingId, onUpdated }) {
               <option value="">Select category</option>
               {categories.map(c => (<option key={c.id} value={c.id}>{c.name}</option>))}
             </select>
+            {!addingCat && (
+            <button
+              type="button"
+              onClick={() => setAddingCat(true)}
+              className="px-4 py-2 text-sm font-medium text-white bg-amber-600 rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Add New Category
+            </button>
+
+            )}
+            {addingCat && (
+              <div className="flex gap-2">
+                <input value={newCat} onChange={(e) => setNewCat(e.target.value)} placeholder="Category name" className="rounded border border-neutral-800 bg-neutral-950 px-3 py-2 w-full" />
+                <button type="button" onClick={createCategory} disabled={catSaving || !newCat.trim().length} className="rounded bg-white px-3 py-2 text-black">
+                  {catSaving ? 'Saving...' : 'Save'}
+                </button>
+                <button type="button" onClick={() => { setAddingCat(false); setNewCat(''); }} className="rounded border border-neutral-700 px-3 py-2">
+                  Cancel
+                </button>
+              </div>
+            )}
             <input value={price} onChange={(e) => setPrice(e.target.value)} className="rounded border border-neutral-800 bg-neutral-950 px-3 py-2" placeholder="Price" />
             <textarea value={description} onChange={(e) => setDescription(e.target.value)} className="col-span-2 rounded border border-neutral-800 bg-neutral-950 px-3 py-2" placeholder="Description" />
             <div className="col-span-2">
@@ -280,7 +367,7 @@ function EditModal({ open, onClose, listingId, onUpdated }) {
               {!!images.length && (
                 <div className="mt-3">
                   <div className="text-sm text-white">Pending Uploads ({images.length})</div>
-                  <div className="mt-2 grid grid-cols-2 gap-3 md:grid-cols-3">
+                  <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-3 md:grid-cols-3">
                     {images.map((f, idx) => (
                       <div key={idx} className="rounded border border-neutral-800 bg-neutral-900 p-2">
                         <div className="landscape-box bg-neutral-800">
@@ -294,7 +381,7 @@ function EditModal({ open, onClose, listingId, onUpdated }) {
                   </div>
                 </div>
               )}
-              <div className="mt-3 grid grid-cols-2 gap-3 md:grid-cols-3">
+              <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3 md:grid-cols-3">
                 {gallery.map(img => (
                   <div key={img.id} className="rounded border border-neutral-800 bg-neutral-900 p-2">
                     <div className="landscape-box bg-neutral-800">
