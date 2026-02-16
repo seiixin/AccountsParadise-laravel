@@ -40,6 +40,7 @@ export default function ChatSidebar() {
       headers: { Accept: 'application/json', 'X-CSRF-TOKEN': token, 'X-XSRF-TOKEN': token, 'X-Requested-With': 'XMLHttpRequest' },
       withCredentials: true,
     }).finally(() => refresh(1));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function loadRoleUsers(r) {
@@ -50,6 +51,7 @@ export default function ChatSidebar() {
 
   useEffect(() => {
     loadRoleUsers(startRole);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [startRole]);
 
   async function startChat() {
@@ -75,7 +77,8 @@ export default function ChatSidebar() {
   }
 
   return (
-    <div className="ap-card p-2 sm:p-3">
+    <div className="ap-card p-3 max-h-[75vh] overflow-y-auto min-h-0 no-scrollbar" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+      <style>{`.no-scrollbar::-webkit-scrollbar{display:none;}`}</style>
       <div className="mb-2 text-xs uppercase tracking-wide text-neutral-400">Start Chat</div>
       <div className="grid grid-cols-1 gap-2 items-start">
         <div className="space-y-1">
