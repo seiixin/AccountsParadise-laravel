@@ -87,12 +87,14 @@ export default function Navbar() {
                 >
                   {role === 'buyer' && (
                     <>
+                      <Link href={route('buyer.chat.inbox')} className="block rounded px-2 py-1 hover:bg-neutral-800 text-white">Inbox</Link>
                       <Link href={route('buyer.dashboard')} className="block rounded px-2 py-1 hover:bg-neutral-800 text-white">Buyer Dashboard</Link>
                       <Link href={route('buyer.orders.index')} className="block rounded px-2 py-1 hover:bg-neutral-800 text-white">My Orders</Link>
                     </>
                   )}
                   {role === 'merchant' && (
                     <>
+                      <Link href={route('merchant.chat.inbox')} className="block rounded px-2 py-1 hover:bg-neutral-800 text-white">Inbox</Link>
                       <Link href={route('merchant.dashboard')} className="block rounded px-2 py-1 hover:bg-neutral-800 text-white">Merchant Dashboard</Link>
                       <Link href={route('merchant.orders.index')} className="block rounded px-2 py-1 hover:bg-neutral-800 text-white">Shop Orders</Link>
                       <Link href="/merchant/payout-requests" className="block rounded px-2 py-1 hover:bg-neutral-800 text-white">Payouts</Link>
@@ -101,12 +103,14 @@ export default function Navbar() {
                   )}
                   {role === 'admin' && (
                     <>
+                      <Link href={route('admin.chat.inbox')} className="block rounded px-2 py-1 hover:bg-neutral-800 text-white">Inbox</Link>
                       <Link href={route('admin.dashboard')} className="block rounded px-2 py-1 hover:bg-neutral-800 text-white">Admin Console</Link>
                       <Link href="/store" className="block rounded px-2 py-1 hover:bg-neutral-800 text-white">Explore Store</Link>
                     </>
                   )}
                   {role === 'midman' && (
                     <>
+                      <Link href={route('midman.chat.inbox')} className="block rounded px-2 py-1 hover:bg-neutral-800 text-white">Inbox</Link>
                       <Link href={route('midman.dashboard')} className="block rounded px-2 py-1 hover:bg-neutral-800 text-white">Midman Dashboard</Link>
                       <Link href="/store" className="block rounded px-2 py-1 hover:bg-neutral-800 text-white">Explore Store</Link>
                     </>

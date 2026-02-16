@@ -37,7 +37,7 @@ export default function Home() {
 
         {/* LEFT-ALIGNED HERO CONTENT */}
         <div className="absolute inset-0 flex items-center">
-          <div className="w-full pl-6 sm:pl-10 lg:pl-20 text-white max-w-3xl">
+          <div className="w-full pl-6 sm:pl-10 lg:pl-20 pr-6 sm:pr-10 lg:pr-20 text-white max-w-3xl">
             <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold leading-tight">
               Level Up Your Game
             </h1>
@@ -59,15 +59,15 @@ export default function Home() {
       </section>
 
       {/* ================= STORE SECTION ================= */}
-      <section className="bg-neutral-950 text-white py-6">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 grid md:grid-cols-2 gap-4 items-center">
+      <section className="bg-neutral-950 text-white py-8">
+        <div className="max-w-7xl mx-auto px-6 md:px-10 lg:px-12 grid md:grid-cols-2 gap-8 items-center md:justify-items-center">
           <img
             src="/AccountsStore.png"
             alt="Game Accounts"
             className="w-full max-w-md mx-auto"
           />
 
-          <div className="text-right">
+          <div className="md:pr-8">
             <h2 className="text-2xl sm:text-4xl font-bold">
               No More Back to Zero
             </h2>
@@ -89,9 +89,9 @@ export default function Home() {
       </section>
 
       {/* ================= BOOSTING SECTION ================= */}
-      <section className="bg-blue py-6">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 grid md:grid-cols-2 gap-4 items-center">
-          <div>
+      <section className="bg-blue py-8">
+        <div className="max-w-7xl mx-auto px-6 md:px-10 lg:px-12 grid md:grid-cols-2 gap-8 items-center md:justify-items-center">
+          <div className="w-full max-w-md md:pl-8">
             <h2 className="text-2xl sm:text-4xl font-bold text-white">
               Stuck at Your Rank?
             </h2>
@@ -118,15 +118,15 @@ export default function Home() {
       </section>
 
       {/* ================= TOP-UP SECTION ================= */}
-      <section className="bg-neutral-950 text-white py-6">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 grid md:grid-cols-2 gap-4 items-center">
+      <section className="bg-neutral-950 text-white py-8">
+        <div className="max-w-7xl mx-auto px-6 md:px-10 lg:px-12 grid md:grid-cols-2 gap-8 items-center md:justify-items-center">
           <img
             src="/top-up.png"
             alt="Top Up Service"
             className="w-full max-w-md mx-auto"
           />
 
-          <div className="text-right">
+          <div className="w-full max-w-md md:pr-8">
             <h2 className="text-2xl sm:text-4xl font-bold">
               Need Diamonds or Credits Fast?
             </h2>
@@ -154,10 +154,10 @@ export default function Home() {
           <p>
             Email:{' '}
             <a
-              href="mailto:BlackAxis2026@gmail.com"
+              href="mailto:blackaxis2026@gmail.com"
               className="text-amber-400 hover:underline"
             >
-              BlackAxis2026@gmail.com
+              blackaxis2026@gmail.com
             </a>
           </p>
 

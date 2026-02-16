@@ -33,207 +33,268 @@ export default function Edit() {
   async function saveField(field) {
     setSaving(true);
     setMessage('');
+
     try {
       let payload;
-      let headers = { Accept: 'application/json' };
       let isFormData = false;
-      if (field === 'name') {
-        payload = { name };
-      } else if (field === 'username') {
-        payload = { username };
-      } else if (field === 'email') {
-        payload = { email };
-      } else if (field === 'avatar') {
+
+      if (field === 'name') payload = { name };
+      if (field === 'username') payload = { username };
+      if (field === 'email') payload = { email };
+
+      if (field === 'avatar') {
         isFormData = true;
         payload = new FormData();
         payload.append('_method', 'PATCH');
+
         if (avatarBlob) {
           const file = new File([avatarBlob], 'avatar.png', { type: 'image/png' });
           payload.append('avatar', file);
-          const dataUrl = await new Promise((resolve) => {
-            const fr = new FileReader();
-            fr.onloadend = () => resolve(fr.result);
-            fr.readAsDataURL(file);
-          });
-          payload.append('avatar_base64', dataUrl);
         } else if (avatar) {
           payload.append('avatar', avatar);
         }
       }
+
       const res = await axios({
         method: isFormData ? 'post' : 'patch',
         url: '/profile',
         data: payload,
-        headers: isFormData ? { ...headers } : headers,
+        headers: { Accept: 'application/json' },
         withCredentials: true,
       });
-      setMessage(res.data?.message ?? 'Saved');
-      if (res.data?.user) {
-        setViewUser(res.data.user);
-      }
+
+      if (res.data?.user) setViewUser(res.data.user);
+
       setNameEdit(false);
       setUsernameEdit(false);
       setEmailEdit(false);
       setAvatarEdit(false);
-      setAvatarBlob(null);
       setAvatar(null);
-    } catch (e) {
+      setAvatarBlob(null);
+
+      setMessage(res.data?.message ?? 'Saved');
+    } catch {
       setMessage('Error saving');
     } finally {
       setSaving(false);
     }
   }
 
+  const role = user?.role;
+  const Layout =
+    role === 'admin'
+      ? AdminLayout
+      : role === 'merchant'
+      ? MerchantLayout
+      : role === 'buyer'
+      ? BuyerLayout
+      : GuestLayout;
+
+  const layoutProps =
+    Layout === GuestLayout
+      ? {}
+      : { title: 'Profile', header: <h2 className="text-xl font-semibold">Profile Settings</h2> };
+
   return (
-    (() => {
-      const role = user?.role;
-      const Layout = role === 'admin'
-        ? AdminLayout
-        : role === 'merchant'
-        ? MerchantLayout
-        : role === 'buyer'
-        ? BuyerLayout
-        : GuestLayout;
-      const layoutProps = Layout === GuestLayout
-        ? {}
-        : { title: 'Profile', header: <h2 className="text-xl font-semibold">Profile Settings</h2> };
-      return (
-        <Layout {...layoutProps}>
+    <Layout {...layoutProps}>
       {Layout === GuestLayout ? <Head title="Profile" /> : null}
-      <div className="mx-auto max-w-7xl space-y-6 p-6">
-        <div className="glass-soft rounded-lg p-4">
-          <div className="text-sm text-neutral-400">Account</div>
-          <div className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="rounded border border-neutral-800 p-3">
-              <div className="text-xs text-neutral-400">Profile Picture</div>
-              <div className="mt-2 flex items-center gap-4">
-                <div className="h-16 w-16 rounded-full bg-neutral-800 overflow-hidden">
-                  {avatarBlob ? (
-                    <img src={URL.createObjectURL(avatarBlob)} alt="avatar" className="h-full w-full object-cover" />
-                  ) : avatarSrc ? (
-                    <img src={avatarSrc} alt="avatar-preview" className="h-full w-full object-cover" />
-                  ) : viewUser.avatar_path ? (
-                    <img src={`/storage/${viewUser.avatar_path}?t=${Date.now()}`} alt="avatar" className="h-full w-full object-cover" />
-                  ) : null}
-                </div>
+
+      <div className="mx-auto max-w-5xl px-4 py-6 space-y-6">
+
+        {/* ACCOUNT SECTION */}
+        <div className="rounded-lg border border-neutral-800 bg-neutral-950 p-4 space-y-6">
+
+          {/* AVATAR */}
+          <div className="text-center sm:text-left">
+            <div className="text-xs text-neutral-400">Profile Picture</div>
+
+            <div className="mt-3 flex flex-col sm:flex-row items-center gap-4">
+              <div className="h-24 w-24 rounded-full bg-neutral-800 overflow-hidden mx-auto sm:mx-0">
+                {viewUser.avatar_path && (
+                  <img
+                    src={`/storage/${viewUser.avatar_path}?t=${Date.now()}`}
+                    className="h-full w-full object-cover"
+                  />
+                )}
+              </div>
+
+              <div className="w-full sm:w-auto">
                 {!avatarEdit ? (
                   <button
                     onClick={() => {
                       setAvatarEdit(true);
-                      const el = fileInputRef.current;
-                      if (el) el.click();
+                      fileInputRef.current?.click();
                     }}
-                    className="rounded glass-soft px-3 py-2"
+                    className="rounded border border-neutral-700 px-4 py-2 w-full sm:w-auto"
                   >
-                    Edit
+                    Change Avatar
                   </button>
                 ) : (
-                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                  <div className="space-y-2">
                     <input
+                      ref={fileInputRef}
                       type="file"
                       accept="image/*"
-                      ref={fileInputRef}
-                      onChange={(e) => {
-                        const file = e.target.files?.[0] ?? null;
-                        setAvatar(file);
-                        if (file) {
-                          const url = URL.createObjectURL(file);
-                          setAvatarSrc(url);
-                          setAvatarModalOpen(true);
-                        }
-                      }}
-                      className="rounded border border-neutral-800 bg-neutral-950 px-3 py-2 w-full sm:w-auto"
+                      onChange={(e) => setAvatar(e.target.files?.[0] ?? null)}
+                      className="w-full"
                     />
-                    <button onClick={() => saveField('avatar')} className="rounded bg-blue-600 px-3 py-2 text-white w-full sm:w-auto" disabled={saving}>Save</button>
-                    <button onClick={() => { setAvatarEdit(false); setAvatar(null); }} className="rounded bg-neutral-800 px-3 py-2 w-full sm:w-auto">Cancel</button>
+                    <div className="flex flex-col sm:flex-row gap-2">
+                      <button
+                        onClick={() => saveField('avatar')}
+                        className="rounded bg-blue-600 px-4 py-2 text-white w-full sm:w-auto"
+                      >
+                        Save
+                      </button>
+                      <button
+                        onClick={() => setAvatarEdit(false)}
+                        className="rounded bg-neutral-800 px-4 py-2 w-full sm:w-auto"
+                      >
+                        Cancel
+                      </button>
+                    </div>
                   </div>
                 )}
               </div>
             </div>
+          </div>
 
-            <div className="rounded border border-neutral-800 p-3">
-              <div className="text-xs text-neutral-400">Name</div>
-              {!nameEdit ? (
-                <div className="mt-2 flex items-center justify-between">
-                  <div className="font-medium">{viewUser.name}</div>
-                  <button onClick={() => setNameEdit(true)} className="rounded glass-soft px-3 py-2">Edit</button>
-                </div>
-              ) : (
-                <div className="mt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-                  <input value={name} onChange={(e) => setName(e.target.value)} className="rounded border border-neutral-800 bg-neutral-950 px-3 py-2 w-full sm:flex-1" />
-                  <button onClick={() => saveField('name')} className="rounded bg-blue-600 px-3 py-2 text-white w-full sm:w-auto" disabled={saving}>Save</button>
-                  <button onClick={() => { setName(viewUser.name ?? ''); setNameEdit(false); }} className="rounded bg-neutral-800 px-3 py-2 w-full sm:w-auto">Cancel</button>
-                </div>
-              )}
-            </div>
+          {/* NAME */}
+          <EditableField
+            label="Name"
+            value={viewUser.name}
+            editing={nameEdit}
+            setEditing={setNameEdit}
+            inputValue={name}
+            setInputValue={setName}
+            onSave={() => saveField('name')}
+            saving={saving}
+          />
 
-            <div className="rounded border border-neutral-800 p-3">
-              <div className="text-xs text-neutral-400">Username</div>
-              {!usernameEdit ? (
-                <div className="mt-2 flex items-center justify-between">
-                  <div className="font-medium">{viewUser.username}</div>
-                  <button onClick={() => setUsernameEdit(true)} className="rounded glass-soft px-3 py-2">Edit</button>
-                </div>
-              ) : (
-                <div className="mt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-                  <input value={username} onChange={(e) => setUsername(e.target.value)} className="rounded border border-neutral-800 bg-neutral-950 px-3 py-2 w-full sm:flex-1" />
-                  <button onClick={() => saveField('username')} className="rounded bg-blue-600 px-3 py-2 text-white w-full sm:w-auto" disabled={saving}>Save</button>
-                  <button onClick={() => { setUsername(viewUser.username ?? ''); setUsernameEdit(false); }} className="rounded bg-neutral-800 px-3 py-2 w-full sm:w-auto">Cancel</button>
-                </div>
-              )}
-            </div>
+          {/* USERNAME */}
+          <EditableField
+            label="Username"
+            value={viewUser.username}
+            editing={usernameEdit}
+            setEditing={setUsernameEdit}
+            inputValue={username}
+            setInputValue={setUsername}
+            onSave={() => saveField('username')}
+            saving={saving}
+          />
 
-            <div className="rounded border border-neutral-800 p-3">
-              <div className="text-xs text-neutral-400">Email</div>
-              {!emailEdit ? (
-                <div className="mt-2 flex items-center justify-between">
-                  <div className="font-medium">{viewUser.email}</div>
-                  <button onClick={() => setEmailEdit(true)} className="rounded glass-soft px-3 py-2">Edit</button>
-                </div>
-              ) : (
-                <div className="mt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-                  <input value={email} onChange={(e) => setEmail(e.target.value)} className="rounded border border-neutral-800 bg-neutral-950 px-3 py-2 w-full sm:flex-1" />
-                  <button onClick={() => saveField('email')} className="rounded bg-blue-600 px-3 py-2 text-white w-full sm:w-auto" disabled={saving}>Save</button>
-                  <button onClick={() => { setEmail(viewUser.email ?? ''); setEmailEdit(false); }} className="rounded bg-neutral-800 px-3 py-2 w-full sm:w-auto">Cancel</button>
-                </div>
-              )}
+          {/* EMAIL */}
+          <EditableField
+            label="Email"
+            value={viewUser.email}
+            editing={emailEdit}
+            setEditing={setEmailEdit}
+            inputValue={email}
+            setInputValue={setEmail}
+            onSave={() => saveField('email')}
+            saving={saving}
+          />
+
+          {message && (
+            <div className="text-sm text-neutral-400">{message}</div>
+          )}
+        </div>
+
+        {/* SECURITY + INFO */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+          <div className="rounded-lg border border-neutral-800 bg-neutral-950 p-4">
+            <div className="text-sm text-neutral-400 mb-3">Security</div>
+            <UpdatePasswordForm />
+          </div>
+
+          <div className="rounded-lg border border-neutral-800 bg-neutral-950 p-4">
+            <div className="text-sm text-neutral-400 mb-3">Account Info</div>
+
+            <div className="space-y-2 text-sm">
+              <InfoRow label="Role" value={viewUser.role} />
+              <InfoRow label="User ID" value={viewUser.id} mono />
+              <InfoRow label="Created" value={viewUser.created_at} mono />
+              <InfoRow label="Updated" value={viewUser.updated_at} mono />
             </div>
           </div>
-          {message && <div className="mt-3 text-sm text-neutral-400">{message}</div>}
+
         </div>
+
+        {/* DANGER ZONE */}
+        <div className="rounded-lg border border-red-900 bg-neutral-950 p-4">
+          <div className="text-sm text-red-500 mb-3">Danger Zone</div>
+          <DeleteUserForm />
+        </div>
+
         <AvatarCropper
           src={avatarSrc}
           open={avatarModalOpen}
           onClose={() => setAvatarModalOpen(false)}
         />
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="glass-soft rounded-lg p-4">
-            <div className="text-sm text-neutral-400">Security</div>
-            <div className="mt-2">
-              <UpdatePasswordForm />
-            </div>
-          </div>
-          <div className="glass-soft rounded-lg p-4">
-            <div className="text-sm text-neutral-400">Account Info</div>
-            <div className="mt-2 grid grid-cols-2 gap-2">
-              <div className="text-neutral-400">Role</div><div className="font-medium">{viewUser.role}</div>
-              <div className="text-neutral-400">User ID</div><div className="font-mono">{viewUser.id}</div>
-              <div className="text-neutral-400">Created</div><div className="font-mono">{viewUser.created_at}</div>
-              <div className="text-neutral-400">Updated</div><div className="font-mono">{viewUser.updated_at}</div>
-            </div>
-          </div>
-        </div>
-
-        <div className="glass-soft rounded-lg p-4">
-          <div className="text-sm text-neutral-400">Danger Zone</div>
-          <div className="mt-2">
-            <DeleteUserForm />
-          </div>
-        </div>
       </div>
-        </Layout>
-      );
-    })()
+    </Layout>
+  );
+}
+
+/* ---------- Small Reusable Components ---------- */
+
+function EditableField({
+  label,
+  value,
+  editing,
+  setEditing,
+  inputValue,
+  setInputValue,
+  onSave,
+  saving,
+}) {
+  return (
+    <div>
+      <div className="text-xs text-neutral-400">{label}</div>
+
+      {!editing ? (
+        <div className="mt-2 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+          <div className="font-medium">{value}</div>
+          <button
+            onClick={() => setEditing(true)}
+            className="rounded border border-neutral-700 px-3 py-2 w-full sm:w-auto"
+          >
+            Edit
+          </button>
+        </div>
+      ) : (
+        <div className="mt-2 flex flex-col sm:flex-row gap-2">
+          <input
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            className="rounded border border-neutral-800 bg-neutral-950 px-3 py-2 w-full"
+          />
+          <button
+            onClick={onSave}
+            disabled={saving}
+            className="rounded bg-blue-600 px-4 py-2 text-white w-full sm:w-auto"
+          >
+            Save
+          </button>
+          <button
+            onClick={() => setEditing(false)}
+            className="rounded bg-neutral-800 px-4 py-2 w-full sm:w-auto"
+          >
+            Cancel
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function InfoRow({ label, value, mono }) {
+  return (
+    <div className="flex flex-col sm:flex-row sm:justify-between">
+      <div className="text-neutral-400">{label}</div>
+      <div className={mono ? 'font-mono' : 'font-medium'}>
+        {value}
+      </div>
+    </div>
   );
 }

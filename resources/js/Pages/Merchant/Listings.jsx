@@ -353,7 +353,7 @@ export default function Listings({ initial }) {
 
   async function remove(id) {
     if (!confirm("Delete this listing?")) return;
-    await axios.delete(`/merchant/listings/${id}`, {
+    await axios.delete(`/merchant/listings/${id}/delete`, {
       headers: secureHeaders(),
       withCredentials: true,
     });

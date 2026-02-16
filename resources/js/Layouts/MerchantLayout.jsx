@@ -1,7 +1,8 @@
-import { Head, usePage } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 import Navbar from '@/Components/Navbar';
 import MerchantSidebar from '@/Components/Merchant/MerchantSidebar';
+import { createPortal } from 'react-dom';
 
 export default function MerchantLayout({ title = 'Merchant', header, children }) {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -13,6 +14,16 @@ export default function MerchantLayout({ title = 'Merchant', header, children })
   useEffect(() => {
     setMobileOpen(false);
   }, [currentUrl]);
+
+  const user = usePage().props?.auth?.user;
+  const role = user?.role;
+  const inboxHref = user
+    ? (role === 'buyer' ? '/buyer/inbox'
+      : role === 'merchant' ? '/merchant/inbox'
+      : role === 'admin' ? '/admin/inbox'
+      : role === 'midman' ? '/midman/inbox'
+      : '/buyer/inbox')
+    : '/login';
 
   return (
     <div className="min-h-screen bg-gradient-app text-neutral-100">
@@ -87,6 +98,17 @@ export default function MerchantLayout({ title = 'Merchant', header, children })
             <MerchantSidebar />
           </div>
         </div>
+      )}
+      {createPortal(
+        <Link
+          href={inboxHref}
+          className="fixed bottom-4 right-4 z-[2147483647] flex h-12 w-12 md:h-16 md:w-16 items-center justify-center rounded-full bg-white text-black shadow-lg hover:bg-white"
+          aria-label="Inbox"
+          title="Inbox"
+        >
+          <img src="/message.png" alt="Inbox" className="h-6 w-6 md:h-8 md:w-8" draggable="false" />
+        </Link>,
+        document.body
       )}
     </div>
   );

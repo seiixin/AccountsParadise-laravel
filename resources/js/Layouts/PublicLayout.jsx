@@ -30,11 +30,11 @@ export default function PublicLayout({ children, header, fullWidth = false }) {
       {createPortal(
         <Link
           href={inboxHref}
-          className="fixed bottom-4 right-4 z-[2147483647] flex h-12 w-12 items-center justify-center rounded-full bg-white text-black shadow-lg hover:bg-white"
+          className="fixed bottom-4 right-4 z-[2147483647] flex h-12 w-12 md:h-16 md:w-16 items-center justify-center rounded-full bg-white text-black shadow-lg hover:bg-white"
           aria-label="Inbox"
           title="Inbox"
         >
-          <img src="/message.png" alt="Inbox" className="h-6 w-6" draggable="false" />
+          <img src="/message.png" alt="Inbox" className="h-6 w-6 md:h-8 md:w-8" draggable="false" />
         </Link>,
         document.body
       )}

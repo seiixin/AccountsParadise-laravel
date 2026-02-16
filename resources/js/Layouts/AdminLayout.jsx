@@ -1,7 +1,8 @@
 import { Head, Link, usePage } from '@inertiajs/react';
-import AdminNavbar from '@/Components/Admin/AdminNavbar';
+import Navbar from '@/Components/Navbar';
 import AdminSidebar from '@/Components/Admin/AdminSidebar';
 import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 export default function AdminLayout({ title, header, children }) {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -11,13 +12,23 @@ export default function AdminLayout({ title, header, children }) {
     setMobileOpen(false);
   }, [currentUrl]);
 
+  const user = usePage().props?.auth?.user;
+  const role = user?.role;
+  const inboxHref = user
+    ? (role === 'buyer' ? '/buyer/inbox'
+      : role === 'merchant' ? '/merchant/inbox'
+      : role === 'admin' ? '/admin/inbox'
+      : role === 'midman' ? '/midman/inbox'
+      : '/buyer/inbox')
+    : '/login';
+
   return (
     <div className="min-h-screen bg-gradient-app text-neutral-100">
       <Head title={title ?? 'Admin'} />
 
       {/* Navbar */}
       <div className="glass">
-        <AdminNavbar />
+        <Navbar />
       </div>
 
       <div className="mx-auto max-w-7xl p-4 md:p-6">
@@ -110,7 +121,17 @@ export default function AdminLayout({ title, header, children }) {
         </div>
       )}
 
-      
+      {createPortal(
+        <Link
+          href={inboxHref}
+          className="fixed bottom-4 right-4 z-[2147483647] flex h-12 w-12 md:h-16 md:w-16 items-center justify-center rounded-full bg-white text-black shadow-lg hover:bg-white"
+          aria-label="Inbox"
+          title="Inbox"
+        >
+          <img src="/message.png" alt="Inbox" className="h-6 w-6 md:h-8 md:w-8" draggable="false" />
+        </Link>,
+        document.body
+      )}
     </div>
   );
 }
