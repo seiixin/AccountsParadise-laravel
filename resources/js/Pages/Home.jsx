@@ -97,7 +97,7 @@ export default function Home() {
       <section className="bg-neutral-950 text-white py-8">
         <div className="max-w-7xl mx-auto px-6 md:px-10 lg:px-12 grid md:grid-cols-2 gap-8 items-center md:justify-items-center">
           <img
-            src="/AccountsStore.png"
+            src="/AccountsStore.jpg"
             alt="Game Accounts"
             className="w-full max-w-md mx-auto"
           />

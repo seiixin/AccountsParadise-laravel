@@ -21,6 +21,7 @@ class PurchaseController extends Controller
             'payment_reference' => ['required', 'string'],
             'id_image' => ['nullable', 'file', 'mimes:jpg,jpeg,png,webp,ico', 'max:10240'],
             'receipt_image' => ['nullable', 'file', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
+            'face_image' => ['nullable', 'file', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
         ]);
 
         $listing = DB::table('listings')
@@ -64,11 +65,17 @@ class PurchaseController extends Controller
                 $receiptPath = $request->file('receipt_image')->store('receipts/' . auth()->id(), 'public');
             }
 
+            $facePath = null;
+            if ($request->hasFile('face_image')) {
+                $facePath = $request->file('face_image')->store('faces/' . auth()->id(), 'public');
+            }
+
             $proof = OrderPaymentProof::create([
                 'order_id' => $order->id,
                 'payment_reference' => $request->string('payment_reference')->toString(),
                 'id_image_path' => $idPath,
                 'receipt_image_path' => $receiptPath,
+                'face_image_path' => $facePath,
                 'status' => 'pending',
             ]);
             $idPathOut = $idPath;

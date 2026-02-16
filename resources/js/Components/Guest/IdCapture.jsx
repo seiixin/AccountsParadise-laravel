@@ -1,6 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 
-export default function IdCapture({ open, onClose, onCapture, facingMode = 'environment' }) {
+export default function IdCapture({
+  open,
+  onClose,
+  onCapture,
+  facingMode = 'environment',
+  overlayFrame = true,
+  cropToFrame = true,
+}) {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const streamRef = useRef(null);
@@ -38,15 +45,22 @@ export default function IdCapture({ open, onClose, onCapture, facingMode = 'envi
     const v = videoRef.current;
     const c = canvasRef.current;
     if (!v || !c) return;
-    const rw = dims.w;
-    const rh = dims.h;
-    const rect = v.getBoundingClientRect();
-    const sx = Math.max(0, (v.videoWidth - rw) / 2);
-    const sy = Math.max(0, (v.videoHeight - rh) / 2);
-    c.width = rw;
-    c.height = rh;
     const ctx = c.getContext('2d');
-    ctx.drawImage(v, sx, sy, rw, rh, 0, 0, rw, rh);
+    if (cropToFrame) {
+      const rw = dims.w;
+      const rh = dims.h;
+      const sx = Math.max(0, (v.videoWidth - rw) / 2);
+      const sy = Math.max(0, (v.videoHeight - rh) / 2);
+      c.width = rw;
+      c.height = rh;
+      ctx.drawImage(v, sx, sy, rw, rh, 0, 0, rw, rh);
+    } else {
+      const vw = v.videoWidth || 640;
+      const vh = v.videoHeight || 480;
+      c.width = vw;
+      c.height = vh;
+      ctx.drawImage(v, 0, 0, vw, vh);
+    }
     c.toBlob(async (blob) => {
       if (!blob) return;
       const file = new File([blob], 'buyer-id.jpg', { type: blob.type || 'image/jpeg' });
@@ -61,10 +75,12 @@ export default function IdCapture({ open, onClose, onCapture, facingMode = 'envi
       <div className="w-full max-w-2xl rounded-2xl glass-soft p-4">
         <div className="relative w-full flex items-center justify-center">
           <video ref={videoRef} playsInline muted className="w-full rounded-lg bg-black" />
-          <div
-            className="absolute border-2 border-yellow-400 rounded-md shadow-inner pointer-events-none"
-            style={{ width: `${dims.w}px`, height: `${dims.h}px` }}
-          />
+          {overlayFrame && (
+            <div
+              className="absolute border-2 border-yellow-400 rounded-md shadow-inner pointer-events-none"
+              style={{ width: `${dims.w}px`, height: `${dims.h}px` }}
+            />
+          )}
         </div>
         <div className="mt-4 flex items-center justify-end gap-2">
           <button onClick={onClose} className="rounded glass-soft px-4 py-2">Cancel</button>

@@ -21,6 +21,12 @@ class OrderPaymentProofController extends Controller
             'id_image' => ['nullable', 'file', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
             'receipt_image' => ['nullable', 'file', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
             'face_image' => ['nullable', 'file', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
+            'id_image_url' => ['nullable', 'url'],
+            'receipt_image_url' => ['nullable', 'url'],
+            'face_image_url' => ['nullable', 'url'],
+            'id_image_path' => ['nullable', 'string'],
+            'receipt_image_path' => ['nullable', 'string'],
+            'face_image_path' => ['nullable', 'string'],
         ]);
 
         $proof = null;
@@ -28,14 +34,26 @@ class OrderPaymentProofController extends Controller
             $idPath = null;
             if ($request->hasFile('id_image')) {
                 $idPath = $request->file('id_image')->store('ids/' . auth()->id(), 'public');
+            } elseif ($request->filled('id_image_url')) {
+                $idPath = $request->string('id_image_url')->toString();
+            } elseif ($request->filled('id_image_path')) {
+                $idPath = $request->string('id_image_path')->toString();
             }
             $receiptPath = null;
             if ($request->hasFile('receipt_image')) {
                 $receiptPath = $request->file('receipt_image')->store('receipts/' . auth()->id(), 'public');
+            } elseif ($request->filled('receipt_image_url')) {
+                $receiptPath = $request->string('receipt_image_url')->toString();
+            } elseif ($request->filled('receipt_image_path')) {
+                $receiptPath = $request->string('receipt_image_path')->toString();
             }
             $facePath = null;
             if ($request->hasFile('face_image')) {
                 $facePath = $request->file('face_image')->store('faces/' . auth()->id(), 'public');
+            } elseif ($request->filled('face_image_url')) {
+                $facePath = $request->string('face_image_url')->toString();
+            } elseif ($request->filled('face_image_path')) {
+                $facePath = $request->string('face_image_path')->toString();
             }
             $proof = OrderPaymentProof::create([
                 'order_id' => (int) $request->input('order_id'),

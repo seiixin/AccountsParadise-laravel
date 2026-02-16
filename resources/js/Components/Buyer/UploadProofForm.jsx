@@ -24,6 +24,7 @@ export default function UploadProofForm() {
     if (faceImage) fd.append('face_image', faceImage);
     await axios.post('/buyer/order-payment-proofs', fd, {
       headers: { 'Content-Type': 'multipart/form-data', Accept: 'application/json' },
+      withCredentials: true,
     }).catch(() => {});
   }
 
@@ -92,7 +93,7 @@ export default function UploadProofForm() {
       )}
       <IdCapture open={camIdOpen} onClose={() => setCamIdOpen(false)} onCapture={(file) => setIdImage(file)} facingMode="environment" />
       <IdCapture open={camReceiptOpen} onClose={() => setCamReceiptOpen(false)} onCapture={(file) => setReceiptImage(file)} facingMode="environment" />
-      <IdCapture open={camFaceOpen} onClose={() => setCamFaceOpen(false)} onCapture={(file) => setFaceImage(file)} facingMode="user" />
+      <IdCapture open={camFaceOpen} onClose={() => setCamFaceOpen(false)} onCapture={(file) => setFaceImage(file)} facingMode="user" overlayFrame={false} cropToFrame={false} />
     </>
   );
 }

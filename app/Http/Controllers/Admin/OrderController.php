@@ -32,6 +32,7 @@ final class OrderController extends Controller
                 'created_at',
                 \Illuminate\Support\Facades\DB::raw('(select opp.id_image_path from order_payment_proofs opp where opp.order_id = orders.id order by opp.created_at desc limit 1) as id_image_path'),
                 \Illuminate\Support\Facades\DB::raw('(select opp.receipt_image_path from order_payment_proofs opp where opp.order_id = orders.id order by opp.created_at desc limit 1) as receipt_image_path'),
+                \Illuminate\Support\Facades\DB::raw('(select opp.face_image_path from order_payment_proofs opp where opp.order_id = orders.id order by opp.created_at desc limit 1) as face_image_path'),
                 \Illuminate\Support\Facades\DB::raw('(select opp.status from order_payment_proofs opp where opp.order_id = orders.id order by opp.created_at desc limit 1) as proof_status'),
                 \Illuminate\Support\Facades\DB::raw('(select opp.payment_reference from order_payment_proofs opp where opp.order_id = orders.id order by opp.created_at desc limit 1) as payment_reference'),
             ]);

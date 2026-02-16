@@ -17,13 +17,14 @@ RUN composer install --no-dev --prefer-dist --optimize-autoloader --no-interacti
 # ---------- Final runtime image (Apache + PHP) ----------
 FROM php:8.2-apache
 WORKDIR /var/www/html
+ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
 
 # Enable Apache rewrites and set DocumentRoot to public (idempotent)
 RUN a2enmod rewrite \
- && sed -ri 's#DocumentRoot /var/www/html#DocumentRoot /var/www/html/public#' /etc/apache2/sites-available/000-default.conf \
- && printf "<Directory /var/www/html/public>\n\tAllowOverride All\n</Directory>\n" > /etc/apache2/conf-available/laravel-public.conf \
- && a2enconf laravel-public \
- && sed -ri "s#Listen 80#Listen ${PORT:-10000}#" /etc/apache2/ports.conf
+ && printf "Listen ${PORT:-10000}\n" > /etc/apache2/ports.conf \
+ && printf "<VirtualHost *:${PORT:-10000}>\n\tDocumentRoot ${APACHE_DOCUMENT_ROOT}\n\t<Directory ${APACHE_DOCUMENT_ROOT}>\n\t\tAllowOverride All\n\t\tRequire all granted\n\t\tDirectoryIndex index.php\n\t</Directory>\n</VirtualHost>\n" > /etc/apache2/sites-available/laravel.conf \
+ && a2dissite 000-default \
+ && a2ensite laravel
 
 # Install PHP extensions commonly needed by Laravel
 RUN apt-get update && apt-get install -y \

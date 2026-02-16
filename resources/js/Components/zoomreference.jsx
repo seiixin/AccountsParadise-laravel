@@ -171,6 +171,7 @@ export default function AssetImagesViewer({
   className = "",
   initialActiveIndex = 0,
   showThumbs = true,
+  disableZoom = false,
 }) {
   // -------- Build media list --------
   const derivedImages = useMemo(() => {
@@ -279,7 +280,7 @@ export default function AssetImagesViewer({
     };
   }, [active?.src, naturalW, naturalH, VIEW_W, VIEW_H]);
 
-  const canZoom = !!(active?.type === "image" && naturalW && !isCoarsePointer);
+  const canZoom = !!(!disableZoom && active?.type === "image" && naturalW && !isCoarsePointer);
 
   const move = (clientX, clientY) => {
     if (!containerRef.current || !canZoom) return;
@@ -444,8 +445,27 @@ export default function AssetImagesViewer({
      -------------------------- */
   const [portalEl, setPortalEl] = useState(null);
   useEffect(() => {
-    if (!zoomPortalId) return setPortalEl(null);
-    setPortalEl(document.getElementById(zoomPortalId) || null);
+    if (!zoomPortalId) {
+      setPortalEl(null);
+      return;
+    }
+    const immediate = document.getElementById(zoomPortalId) || null;
+    if (immediate) {
+      setPortalEl(immediate);
+      return;
+    }
+    let attempts = 0;
+    const id = setInterval(() => {
+      const el = document.getElementById(zoomPortalId);
+      attempts++;
+      if (el) {
+        setPortalEl(el);
+        clearInterval(id);
+      } else if (attempts > 40) {
+        clearInterval(id);
+      }
+    }, 50);
+    return () => clearInterval(id);
   }, [zoomPortalId]);
 
   // Zoom box — ABSOLUTE + pointer-events none (overlay on right context, not affecting layout)

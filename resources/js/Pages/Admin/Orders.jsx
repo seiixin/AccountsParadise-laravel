@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { usePage } from '@inertiajs/react';
 import axios from 'axios';
 import ZoomViewer from '@/Components/zoomreference';
+import { createPortal } from 'react-dom';
 
 export default function Orders({ initial }) {
     const [data, setData] = useState(initial?.data ?? []);
@@ -14,9 +15,19 @@ export default function Orders({ initial }) {
     const [newStatus, setNewStatus] = useState('');
     const role = usePage().props?.auth?.user?.role ?? 'admin';
     const [preview, setPreview] = useState(null);
+    const [wide, setWide] = useState(
+        typeof window !== 'undefined' ? window.innerWidth >= 1024 : false
+    );
 
     useEffect(() => {
         refresh();
+        const onResize = () => {
+            if (typeof window !== 'undefined') {
+                setWide(window.innerWidth >= 1024);
+            }
+        };
+        window.addEventListener('resize', onResize);
+        return () => window.removeEventListener('resize', onResize);
     }, []);
 
     async function refresh(page = 1) {
@@ -118,6 +129,9 @@ export default function Orders({ initial }) {
                             <th className="p-2">Type</th>
                             <th className="p-2">Buyer</th>
                             <th className="p-2">Status</th>
+                            <th className="p-2">Valid ID</th>
+                            <th className="p-2">Receipt</th>
+                            <th className="p-2">Face ID</th>
                             <th className="p-2">Created</th>
                             <th className="p-2">Actions</th>
                         </tr>
@@ -129,6 +143,63 @@ export default function Orders({ initial }) {
                                 <td className="p-2">{o.listing_type_snapshot ?? '—'}</td>
                                 <td className="p-2">#{o.buyer_id}</td>
                                 <td className="p-2">{o.status}</td>
+                                <td className="p-2">
+                                    {o.id_image_path ? (
+                                        <button
+                                            onClick={() =>
+                                                setPreview([
+                                                    {
+                                                        type: 'image',
+                                                        src: o.id_image_path.startsWith('http')
+                                                            ? o.id_image_path
+                                                            : `/storage/${o.id_image_path}`,
+                                                    },
+                                                ])
+                                            }
+                                            className="rounded border border-neutral-700 px-2 py-1"
+                                        >
+                                            View
+                                        </button>
+                                    ) : '—'}
+                                </td>
+                                <td className="p-2">
+                                    {o.receipt_image_path ? (
+                                        <button
+                                            onClick={() =>
+                                                setPreview([
+                                                    {
+                                                        type: 'image',
+                                                        src: o.receipt_image_path.startsWith('http')
+                                                            ? o.receipt_image_path
+                                                            : `/storage/${o.receipt_image_path}`,
+                                                    },
+                                                ])
+                                            }
+                                            className="rounded border border-neutral-700 px-2 py-1"
+                                        >
+                                            View
+                                        </button>
+                                    ) : '—'}
+                                </td>
+                                <td className="p-2">
+                                    {o.face_image_path ? (
+                                        <button
+                                            onClick={() =>
+                                                setPreview([
+                                                    {
+                                                        type: 'image',
+                                                        src: o.face_image_path.startsWith('http')
+                                                            ? o.face_image_path
+                                                            : `/storage/${o.face_image_path}`,
+                                                    },
+                                                ])
+                                            }
+                                            className="rounded border border-neutral-700 px-2 py-1"
+                                        >
+                                            View
+                                        </button>
+                                    ) : '—'}
+                                </td>
                                 <td className="p-2">
                                     {new Date(o.created_at).toLocaleDateString()}
                                 </td>
@@ -168,6 +239,38 @@ export default function Orders({ initial }) {
                         <div className="text-sm">Status: {o.status}</div>
                         <div className="text-sm">
                             {new Date(o.created_at).toLocaleDateString()}
+                        </div>
+                        <div className="flex gap-2 pt-2">
+                            {o.id_image_path && (
+                                <button
+                                    onClick={() =>
+                                        setPreview([{ type: 'image', src: o.id_image_path.startsWith('http') ? o.id_image_path : `/storage/${o.id_image_path}` }])
+                                    }
+                                    className="rounded border border-neutral-700 px-3 py-1"
+                                >
+                                    Valid ID
+                                </button>
+                            )}
+                            {o.receipt_image_path && (
+                                <button
+                                    onClick={() =>
+                                        setPreview([{ type: 'image', src: o.receipt_image_path.startsWith('http') ? o.receipt_image_path : `/storage/${o.receipt_image_path}` }])
+                                    }
+                                    className="rounded border border-neutral-700 px-3 py-1"
+                                >
+                                    Receipt
+                                </button>
+                            )}
+                            {o.face_image_path && (
+                                <button
+                                    onClick={() =>
+                                        setPreview([{ type: 'image', src: o.face_image_path.startsWith('http') ? o.face_image_path : `/storage/${o.face_image_path}` }])
+                                    }
+                                    className="rounded border border-neutral-700 px-3 py-1"
+                                >
+                                    Face ID
+                                </button>
+                            )}
                         </div>
 
                         <div className="flex flex-col gap-2 pt-2">
@@ -240,6 +343,38 @@ export default function Orders({ initial }) {
                         </div>
                     </div>
                 </div>
+            )}
+
+            {Array.isArray(preview) && preview.length > 0 && createPortal(
+                <div className="fixed inset-0 z-[2147483646] flex items-center justify-center bg-black/70 p-4">
+                    <div className="w-full max-w-[1200px] rounded-lg border border-neutral-800 bg-neutral-950 p-4">
+                        <div className="mb-3 text-lg font-semibold">Proof Preview</div>
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                            <div className="w-full">
+                                <ZoomViewer
+                                    media={preview}
+                                    showThumbs={false}
+                                    zoomPortalId={wide ? 'admin-zoom-portal' : null}
+                                    zoomWidth={640}
+                                    zoomHeight={640}
+                                    disableZoom={!wide}
+                                />
+                            </div>
+                            <div className="relative hidden lg:block min-h-[640px]">
+                                <div id="admin-zoom-portal" className="absolute inset-0" />
+                            </div>
+                        </div>
+                        <div className="mt-4 flex justify-end">
+                            <button
+                                onClick={() => setPreview(null)}
+                                className="rounded bg-neutral-800 px-4 py-2"
+                            >
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                </div>,
+                document.body
             )}
 
         </AdminLayout>

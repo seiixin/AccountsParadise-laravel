@@ -283,7 +283,7 @@ export default function Listing({ listing, images = [] }) {
         )
       }
       <IdCapture open={cameraOpen} onClose={() => setCameraOpen(false)} onCapture={(file) => setIdImage(file)} facingMode="environment" />
-      <IdCapture open={faceCamOpen} onClose={() => setFaceCamOpen(false)} onCapture={(file) => setFaceImage(file)} facingMode="user" />
+      <IdCapture open={faceCamOpen} onClose={() => setFaceCamOpen(false)} onCapture={(file) => setFaceImage(file)} facingMode="user" overlayFrame={false} cropToFrame={false} />
     </PublicLayout>
   );
 }
